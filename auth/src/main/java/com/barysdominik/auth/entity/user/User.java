@@ -18,7 +18,6 @@ import java.util.UUID;
 @Getter
 @Table(name = "users")
 @Entity
-@NoArgsConstructor
 @AllArgsConstructor
 public class User implements UserDetails {
     @Id
@@ -28,6 +27,7 @@ public class User implements UserDetails {
     private String uuid;
     private String username;
     private String password;
+    private String email;
     @Enumerated(EnumType.STRING)
     private Role role;
     @Enumerated(EnumType.STRING)
@@ -35,12 +35,19 @@ public class User implements UserDetails {
     private LocalDate joinedAt;
     private int amountOfCreatedTutorials;
     private int amountOfReviews;
+    @Column(name = "islock")
     private boolean isLock;
+    @Column(name = "isenabled")
     private boolean isEnabled;
+
+    public User(){
+        generateUuid();
+    }
 
     public User(
             String username,
             String password,
+            String email,
             Role role,
             Rank rank,
             LocalDate joinedAt,
@@ -51,6 +58,7 @@ public class User implements UserDetails {
     ) {
         this.username = username;
         this.password = password;
+        this.email = email;
         this.role = role;
         this.rank = rank;
         this.joinedAt = joinedAt;

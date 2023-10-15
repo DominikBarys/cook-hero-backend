@@ -19,9 +19,9 @@ public class TestClass {
 
     @PostConstruct
     public void test() {
-        User user = new User("testuser", "testuser", Role.USER, Rank.ADVANCED, LocalDate.now(),
-                4, 5, true, true);
-        userService.saveUser(user);
+//        User user = new User("testuser", "testuser", Role.USER, Rank.ADVANCED, LocalDate.now(),
+//                4, 5, true, true);
+        //userService.saveUser(user);
     }
 
 }
