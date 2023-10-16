@@ -2,10 +2,11 @@ package com.barysdominik.auth.entity.http;
 
 import lombok.Builder;
 import lombok.Data;
+import lombok.Getter;
 
 import java.sql.Timestamp;
 
-@Data
+@Getter
 public class AuthResponse {
     private final String timestamp;
     private final String message;

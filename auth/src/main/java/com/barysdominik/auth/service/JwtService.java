@@ -1,5 +1,6 @@
 package com.barysdominik.auth.service;
 
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
@@ -15,15 +16,13 @@ import java.util.Map;
 @Service
 public class JwtService {
 
-    public JwtService(@Value("${jwt.secret}") String SECRET, @Value("${jwt.exp}") int EXP) {
+    public JwtService(@Value("${jwt.secret}") String SECRET) {
         this.SECRET = SECRET;
-        this.EXP = EXP;
     }
 
     private final String SECRET;
-    private final int EXP;
 
-    public void validateToken(final String token) {
+    public void validateToken(final String token) throws ExpiredJwtException, IllegalArgumentException {
         //if token will be incorrect, exception will be thrown
         Jwts.parserBuilder().setSigningKey(getSignKey()).build().parseClaimsJws(token);
     }
@@ -33,18 +32,18 @@ public class JwtService {
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
-    public String generateToken(String username) {
+    public String generateToken(String username, int exp) {
         //claims can be additional info to put in token
         Map<String, Object> claims = new HashMap<>();
-        return createToken(claims, username);
+        return createToken(claims, username, exp);
     }
 
-    private String createToken(Map<String, Object> claims, String username) {
+    private String createToken(Map<String, Object> claims, String username, int exp) {
         return Jwts.builder()
                 .setClaims(claims)
                 .setSubject(username)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + EXP))
+                .setExpiration(new Date(System.currentTimeMillis() + exp))
                 .signWith(getSignKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
