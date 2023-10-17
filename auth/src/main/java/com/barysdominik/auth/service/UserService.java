@@ -6,6 +6,8 @@ import com.barysdominik.auth.entity.user.Rank;
 import com.barysdominik.auth.entity.user.Role;
 import com.barysdominik.auth.entity.user.User;
 import com.barysdominik.auth.entity.user.UserRegisterDTO;
+import com.barysdominik.auth.exception.DuplicateMailException;
+import com.barysdominik.auth.exception.DuplicateUsernameException;
 import com.barysdominik.auth.repository.UserRepository;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.http.Cookie;
@@ -45,7 +47,10 @@ public class UserService {
         return jwtService.generateToken(username, exp);
     }
 
-    public void validateToken(HttpServletRequest request) throws ExpiredJwtException, IllegalArgumentException {
+    public void validateToken(
+            HttpServletRequest request,
+            HttpServletResponse response
+    ) throws ExpiredJwtException, IllegalArgumentException {
         String token = null;
         String refresh = null;
         for(Cookie cookie : Arrays.stream(request.getCookies()).toList()) {
@@ -59,16 +64,34 @@ public class UserService {
             jwtService.validateToken(token);
         } catch (ExpiredJwtException | IllegalArgumentException e) {
             jwtService.validateToken(refresh);
+            Cookie refreshToken = cookieService.generateCookie(
+                    "refresh",
+                    jwtService.refreshToken(refresh, refreshExp),
+                    refreshExp
+            );
+            Cookie authorizationToken = cookieService.generateCookie(
+                    "token",
+                    jwtService.refreshToken(token, exp),
+                    exp
+            );
+            response.addCookie(authorizationToken);
+            response.addCookie(refreshToken);
         }
     }
 
-    public void register(UserRegisterDTO userRegisterDTO) {
+    public void register(UserRegisterDTO userRegisterDTO) throws DuplicateUsernameException, DuplicateMailException {
+        userRepository.findUserByUsername(userRegisterDTO.getUsername()).ifPresent(value -> {
+            throw new DuplicateUsernameException("Użytkownik o takiej nazwie już istnieje");
+        });
+        userRepository.findUserByEmail(userRegisterDTO.getEmail()).ifPresent(value -> {
+            throw new DuplicateMailException("Użytkownik o takim mailu już istnieje");
+        });
         User user = new User();
         user.setUsername(userRegisterDTO.getUsername());
         user.setPassword(userRegisterDTO.getPassword());
         user.setEmail(userRegisterDTO.getEmail());
-        user.setRole(userRegisterDTO.getRole() != null ? userRegisterDTO.getRole() : Role.USER);
-        user.setRank(userRegisterDTO.getRank() != null ? userRegisterDTO.getRank() : Rank.ROOKIE);
+        user.setRole(Role.USER);
+        user.setRank(Rank.ROOKIE);
         saveUser(user);
     }
 
@@ -98,12 +121,18 @@ public class UserService {
                                 .role(user.getRole())
                                 .rank(user.getRank())
                                 .build()
-
                 );
             } else {
-                return ResponseEntity.ok(new AuthResponse(Code.CODE1));
+                return ResponseEntity.ok(new AuthResponse(Code.LOGIN_FAILED));
             }
         }
-        return ResponseEntity.ok(new AuthResponse(Code.CODE2));
+        return ResponseEntity.ok(new AuthResponse(Code.USER_NOT_FOUND));
+    }
+
+    public void promoteUserToAdmin(UserRegisterDTO userRegisterDTO) {
+        userRepository.findUserByUsername(userRegisterDTO.getUsername()).ifPresent(value -> {
+            value.setRole(Role.ADMIN);
+            userRepository.save(value);
+        });
     }
 }
