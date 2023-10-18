@@ -58,6 +58,16 @@ public class AuthController {
         return userService.login(httpServletResponse, user);
     }
 
+    @GetMapping("/auto-login")
+    public ResponseEntity<?> autoLogin(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
+        return userService.loginViaToken(httpServletRequest, httpServletResponse);
+    }
+
+    @GetMapping("/logged-in")
+    public ResponseEntity<?> loggedIn(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
+        return userService.isLoggedIn(httpServletRequest, httpServletResponse);
+    }
+
     //add more exception handlers
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(MethodArgumentNotValidException.class)

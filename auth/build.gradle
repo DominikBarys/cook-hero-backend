@@ -32,6 +32,8 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.springframework.cloud:spring-cloud-commons:4.0.4'
     implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
+    implementation 'jakarta.mail:jakarta.mail-api:2.1.2'
+    implementation 'org.eclipse.angus:angus-mail:1.0.0'
     implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
     //if it does not work change it to implementation
     runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'

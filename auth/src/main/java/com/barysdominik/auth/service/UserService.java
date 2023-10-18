@@ -2,6 +2,7 @@ package com.barysdominik.auth.service;
 
 import com.barysdominik.auth.entity.http.AuthResponse;
 import com.barysdominik.auth.entity.http.Code;
+import com.barysdominik.auth.entity.http.LoginResponse;
 import com.barysdominik.auth.entity.user.Rank;
 import com.barysdominik.auth.entity.user.Role;
 import com.barysdominik.auth.entity.user.User;
@@ -14,6 +15,7 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
@@ -53,9 +55,9 @@ public class UserService {
     ) throws ExpiredJwtException, IllegalArgumentException {
         String token = null;
         String refresh = null;
-        if(request.getCookies() != null) {
-            for(Cookie cookie : Arrays.stream(request.getCookies()).toList()) {
-                if(cookie.getName().equals("token")) {
+        if (request.getCookies() != null) {
+            for (Cookie cookie : Arrays.stream(request.getCookies()).toList()) {
+                if (cookie.getName().equals("token")) {
                     token = cookie.getValue();
                 } else if (cookie.getName().equals("refresh")) {
                     refresh = cookie.getValue();
@@ -108,7 +110,7 @@ public class UserService {
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword())
             );
-            if(authentication.isAuthenticated()) {
+            if (authentication.isAuthenticated()) {
                 Cookie refresh = cookieService.generateCookie(
                         "refresh",
                         generateToken(authRequest.getUsername(), refreshExp),
@@ -134,6 +136,43 @@ public class UserService {
             }
         }
         return ResponseEntity.ok(new AuthResponse(Code.USER_NOT_FOUND));
+    }
+
+    public ResponseEntity<?> loginViaToken(HttpServletRequest request, HttpServletResponse response) {
+        try {
+            validateToken(request, response);
+            String refresh = null;
+            for (Cookie value : Arrays.stream(request.getCookies()).toList()) {
+                if (value.getName().equals("refresh")) {
+                    refresh = value.getValue();
+                }
+            }
+            String username = jwtService.getSubject(refresh);
+            User user = userRepository.findUserByUsernameAndLockAndEnabled(username).orElse(null);
+            if (user != null) {
+                return ResponseEntity.ok(
+                        UserRegisterDTO
+                                .builder()
+                                .username(user.getUsername())
+                                .email(user.getEmail())
+                                .role(user.getRole())
+                                .rank(user.getRank())
+                                .build()
+                );
+            }
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new AuthResponse(Code.LOGIN_FAILED));
+        } catch (IllegalArgumentException | ExpiredJwtException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new AuthResponse(Code.INVALID_TOKEN));
+        }
+    }
+
+    public ResponseEntity<?> isLoggedIn(HttpServletRequest request, HttpServletResponse response) {
+        try {
+            validateToken(request, response);
+            return ResponseEntity.ok(new LoginResponse(true));
+        } catch (IllegalArgumentException | ExpiredJwtException e) {
+            return ResponseEntity.ok(new LoginResponse(false));
+        }
     }
 
     public void promoteUserToAdmin(UserRegisterDTO userRegisterDTO) {
