@@ -61,7 +61,7 @@ public class AuthController {
     //add more exception handlers
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ValidationMessage handleValidationException(MethodArgumentNotValidException e) {
+    public ValidationMessage handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
         return new ValidationMessage(e.getBindingResult().getAllErrors().get(0).getDefaultMessage());
     }
 
