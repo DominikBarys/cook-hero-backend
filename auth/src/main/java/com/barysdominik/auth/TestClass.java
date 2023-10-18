@@ -15,8 +15,7 @@ import java.time.LocalDate;
 @RequiredArgsConstructor
 public class TestClass {
 
-    //validate token -> odtad jest git
-    //user validation and refresh token
+    
     private final UserService userService;
 
     @PostConstruct

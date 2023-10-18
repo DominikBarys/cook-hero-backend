@@ -48,6 +48,7 @@ public class AuthController {
             return ResponseEntity.ok(new AuthResponse(Code.PERMIT));
             //illegal odpowiada za to ze jezeli token bedzie nullem to zostanie on rzucony
         } catch (IllegalArgumentException | ExpiredJwtException e) {
+            //e.printStackTrace();
             return ResponseEntity.status(401).body(new AuthResponse(Code.INVALID_TOKEN));
         }
     }

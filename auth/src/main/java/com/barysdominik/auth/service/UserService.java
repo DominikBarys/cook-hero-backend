@@ -64,15 +64,17 @@ public class UserService {
             jwtService.validateToken(token);
         } catch (ExpiredJwtException | IllegalArgumentException e) {
             jwtService.validateToken(refresh);
+            //to rzuca nulla jak zwykly token jest nullem, nie mozna go tez odnowic bo nie ma tutaj nazwy uzytkownika
+            //nieeeleganckim rozwiazaniem byloby zdobycie subjecta z refresha
+            Cookie authorizationToken = cookieService.generateCookie(
+                    "token",
+                    jwtService.refreshToken(refresh, exp),
+                    exp
+            );
             Cookie refreshToken = cookieService.generateCookie(
                     "refresh",
                     jwtService.refreshToken(refresh, refreshExp),
                     refreshExp
-            );
-            Cookie authorizationToken = cookieService.generateCookie(
-                    "token",
-                    jwtService.refreshToken(token, exp),
-                    exp
             );
             response.addCookie(authorizationToken);
             response.addCookie(refreshToken);
