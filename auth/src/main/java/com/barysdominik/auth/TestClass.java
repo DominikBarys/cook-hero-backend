@@ -15,7 +15,8 @@ import java.time.LocalDate;
 @RequiredArgsConstructor
 public class TestClass {
 
-    
+    //validate token -> odtad jest git
+    //recovery mail send
     private final UserService userService;
 
     @PostConstruct

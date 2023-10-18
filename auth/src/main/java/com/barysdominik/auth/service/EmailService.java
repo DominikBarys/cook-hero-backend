@@ -20,15 +20,37 @@ public class EmailService {
     private String frontendUrl;
     //make custom mail message
     @Value("classpath:static/activate-account-mail.html")
-    private Resource mailContent;
+    private Resource activateAccountMailContent;
+    @Value("classpath:static/reset-password-mail.html")
+    private Resource resetPasswordMailContent;
 
     public void sendAccountActivationMail(User user) {
         try {
-            String htmlMailContent = Files.toString(mailContent.getFile(), Charsets.UTF_8);
+            String htmlMailContent = Files.toString(activateAccountMailContent.getFile(), Charsets.UTF_8);
+            htmlMailContent = htmlMailContent.replace(
+                    "FRONTEND_URL",
+                    frontendUrl + "/aktywuj/" + user.getUuid()
+            );
+            emailConfiguration.sendMail(user.getEmail(), htmlMailContent, "Aktywuj konto", true);
         } catch (IOException e) {
-            //make unique exception for this
+            //TODO make unique exception for this
             throw new RuntimeException(e);
         }
+    }
+
+    public void sendPasswordRecoveryMail(User user) {
+        try{
+            String htmlMailContent = Files.toString(resetPasswordMailContent.getFile(), Charsets.UTF_8);
+            htmlMailContent = htmlMailContent.replace(
+                    "FRONTEND_URL",
+                    frontendUrl + "/odzyskaj-haslo/" + user.getUuid()
+            );
+            emailConfiguration.sendMail(user.getEmail(), htmlMailContent,"Odzyskaj hasło",true);
+        }catch (IOException e){
+            //TODO make unique exception for this
+            throw new RuntimeException(e);
+        }
+
     }
 
 }

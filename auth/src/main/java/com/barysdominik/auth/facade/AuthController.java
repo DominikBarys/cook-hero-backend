@@ -3,10 +3,13 @@ package com.barysdominik.auth.facade;
 import com.barysdominik.auth.entity.http.AuthResponse;
 import com.barysdominik.auth.entity.http.Code;
 import com.barysdominik.auth.entity.http.ValidationMessage;
+import com.barysdominik.auth.entity.user.ChangePasswordDTO;
+import com.barysdominik.auth.entity.user.ResetPasswordDTO;
 import com.barysdominik.auth.entity.user.User;
 import com.barysdominik.auth.entity.user.UserRegisterDTO;
 import com.barysdominik.auth.exception.DuplicateMailException;
 import com.barysdominik.auth.exception.DuplicateUsernameException;
+import com.barysdominik.auth.exception.UserDontExistException;
 import com.barysdominik.auth.service.UserService;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -25,7 +28,6 @@ import jakarta.servlet.http.HttpServletResponse;
 public class AuthController {
     private final UserService userService;
 
-    //write all the missing controller methods here
     @PostMapping("/register")
     public ResponseEntity<AuthResponse> registerUser(@Valid @RequestBody UserRegisterDTO userRegisterDTO) {
         try{
@@ -35,6 +37,18 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new AuthResponse(Code.DUPLICATE_USERNAME));
         } catch (DuplicateMailException mailException) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new AuthResponse(Code.DUPLICATE_EMAIL));
+        }
+    }
+
+    @GetMapping("/activate")
+    public ResponseEntity<AuthResponse> activate(@RequestParam String uuid) {
+        try {
+            userService.activate(uuid);
+            return ResponseEntity.ok(new AuthResponse(Code.SUCCESS));
+        } catch (UserDontExistException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                    new AuthResponse(Code.USER_DO_NOT_EXISTS_OR_ACCOUNT_NOT_ACTIVATED)
+            );
         }
     }
 
@@ -48,8 +62,7 @@ public class AuthController {
             return ResponseEntity.ok(new AuthResponse(Code.PERMIT));
             //illegal odpowiada za to ze jezeli token bedzie nullem to zostanie on rzucony
         } catch (IllegalArgumentException | ExpiredJwtException e) {
-            //e.printStackTrace();
-            return ResponseEntity.status(401).body(new AuthResponse(Code.INVALID_TOKEN));
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new AuthResponse(Code.INVALID_TOKEN));
         }
     }
 
@@ -66,6 +79,30 @@ public class AuthController {
     @GetMapping("/logged-in")
     public ResponseEntity<?> loggedIn(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
         return userService.isLoggedIn(httpServletRequest, httpServletResponse);
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<AuthResponse> resetPassword(@RequestBody ResetPasswordDTO resetPasswordDTO) {
+        try{
+            userService.passwordRecovery(resetPasswordDTO.getEmail());
+            return ResponseEntity.ok(new AuthResponse(Code.SUCCESS));
+        }catch (UserDontExistException e){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                    new AuthResponse(Code.USER_DO_NOT_EXISTS_OR_ACCOUNT_NOT_ACTIVATED)
+            );
+        }
+    }
+
+    @PatchMapping("/reset-password")
+    public ResponseEntity<AuthResponse> changePassword(@RequestBody ChangePasswordDTO changePasswordDTO) {
+        try {
+            userService.resetPassword(changePasswordDTO);
+            return ResponseEntity.ok(new AuthResponse(Code.SUCCESS));
+        } catch (UserDontExistException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                    new AuthResponse(Code.USER_DO_NOT_EXISTS_OR_ACCOUNT_NOT_ACTIVATED)
+            );
+        }
     }
 
     //add more exception handlers

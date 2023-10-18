@@ -3,12 +3,10 @@ package com.barysdominik.auth.service;
 import com.barysdominik.auth.entity.http.AuthResponse;
 import com.barysdominik.auth.entity.http.Code;
 import com.barysdominik.auth.entity.http.LoginResponse;
-import com.barysdominik.auth.entity.user.Rank;
-import com.barysdominik.auth.entity.user.Role;
-import com.barysdominik.auth.entity.user.User;
-import com.barysdominik.auth.entity.user.UserRegisterDTO;
+import com.barysdominik.auth.entity.user.*;
 import com.barysdominik.auth.exception.DuplicateMailException;
 import com.barysdominik.auth.exception.DuplicateUsernameException;
+import com.barysdominik.auth.exception.UserDontExistException;
 import com.barysdominik.auth.repository.UserRepository;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.http.Cookie;
@@ -35,6 +33,7 @@ public class UserService {
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
     private final CookieService cookieService;
+    private final EmailService emailService;
     @Value("${jwt.exp}")
     private int exp;
     @Value("${jwt.refresh}")
@@ -95,17 +94,33 @@ public class UserService {
         userRepository.findUserByEmail(userRegisterDTO.getEmail()).ifPresent(value -> {
             throw new DuplicateMailException("Użytkownik o takim mailu już istnieje");
         });
+
         User user = new User();
         user.setUsername(userRegisterDTO.getUsername());
         user.setPassword(userRegisterDTO.getPassword());
         user.setEmail(userRegisterDTO.getEmail());
         user.setRole(Role.USER);
         user.setRank(Rank.ROOKIE);
+        user.setLock(true);
+        user.setEnabled(false);
         saveUser(user);
+
+        emailService.sendAccountActivationMail(user);
+    }
+
+    public void activate(String uuid) throws UserDontExistException{
+        User user = userRepository.findUserByUuid(uuid).orElse(null);
+        if(user != null) {
+            user.setLock(false);
+            user.setEnabled(true);
+            userRepository.save(user);
+            return;
+        }
+        throw new UserDontExistException("User with uuid: '" + uuid + "' does not exist");
     }
 
     public ResponseEntity<?> login(HttpServletResponse response, User authRequest) {
-        User user = userRepository.findUserByUsername(authRequest.getUsername()).orElse(null);
+        User user = userRepository.findNonLockedAndEnabledUserByUsername(authRequest.getUsername()).orElse(null);
         if (user != null) {
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword())
@@ -148,7 +163,7 @@ public class UserService {
                 }
             }
             String username = jwtService.getSubject(refresh);
-            User user = userRepository.findUserByUsernameAndLockAndEnabled(username).orElse(null);
+            User user = userRepository.findNonLockedAndEnabledUserByUsername(username).orElse(null);
             if (user != null) {
                 return ResponseEntity.ok(
                         UserRegisterDTO
@@ -173,6 +188,25 @@ public class UserService {
         } catch (IllegalArgumentException | ExpiredJwtException e) {
             return ResponseEntity.ok(new LoginResponse(false));
         }
+    }
+
+    public void passwordRecovery(String email) throws UserDontExistException{
+        User user = userRepository.findUserByEmail(email).orElse(null);
+        if(user != null) {
+            emailService.sendPasswordRecoveryMail(user);
+            return;
+        }
+        throw new UserDontExistException("User with email: '" + email + "' does not exist");
+    }
+
+    public void resetPassword(ChangePasswordDTO changePasswordDTO) throws UserDontExistException {
+        User user = userRepository.findUserByUuid(changePasswordDTO.getUuid()).orElse(null);
+        if(user != null) {
+            user.setPassword(changePasswordDTO.getPassword());
+            saveUser(user);
+            return;
+        }
+        throw new UserDontExistException("User with uuid: '" + changePasswordDTO.getUuid() + "' does not exist");
     }
 
     public void promoteUserToAdmin(UserRegisterDTO userRegisterDTO) {

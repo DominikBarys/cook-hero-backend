@@ -6,6 +6,7 @@ public enum Code {
     PERMIT("Dostęp został przyznany"),
     LOGIN_FAILED("Logowanie nie powiodło się"),
     USER_NOT_FOUND("Nieprawidłowe dane"),
+    USER_DO_NOT_EXISTS_OR_ACCOUNT_NOT_ACTIVATED("Taki użytkownik nie istnieje lub nie aktywowano konta"),
     INVALID_TOKEN("Wskazany token jest pusty lub nie ważny"),
     DUPLICATE_USERNAME("Użytkownik o tej nazwie już istnieje"),
     DUPLICATE_EMAIL("Użytkownik o tey mailu już istnieje");
