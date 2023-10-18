@@ -16,7 +16,7 @@ import java.time.LocalDate;
 public class TestClass {
 
     //validate token -> odtad jest git
-    //user validation and refresh token
+    //apigateway auth filter
     private final UserService userService;
 
     @PostConstruct

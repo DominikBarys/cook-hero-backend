@@ -53,13 +53,18 @@ public class UserService {
     ) throws ExpiredJwtException, IllegalArgumentException {
         String token = null;
         String refresh = null;
-        for(Cookie cookie : Arrays.stream(request.getCookies()).toList()) {
-            if(cookie.getName().equals("token")) {
-                token = cookie.getValue();
-            } else if (cookie.getName().equals("refresh")) {
-                refresh = cookie.getValue();
+        if(request.getCookies() != null) {
+            for(Cookie cookie : Arrays.stream(request.getCookies()).toList()) {
+                if(cookie.getName().equals("token")) {
+                    token = cookie.getValue();
+                } else if (cookie.getName().equals("refresh")) {
+                    refresh = cookie.getValue();
+                }
             }
+        } else {
+            throw new IllegalArgumentException("Token is null");
         }
+
         try {
             jwtService.validateToken(token);
         } catch (ExpiredJwtException | IllegalArgumentException e) {
