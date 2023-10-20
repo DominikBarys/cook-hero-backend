@@ -9,7 +9,11 @@ public enum Code {
     USER_DO_NOT_EXISTS_OR_ACCOUNT_NOT_ACTIVATED("Taki użytkownik nie istnieje lub nie aktywowano konta"),
     INVALID_TOKEN("Wskazany token jest pusty lub nie ważny"),
     DUPLICATE_USERNAME("Użytkownik o tej nazwie już istnieje"),
-    DUPLICATE_EMAIL("Użytkownik o tey mailu już istnieje");
+    DUPLICATE_EMAIL("Użytkownik o takim mailu już istnieje"),
+    AUTHENTICATION_ERROR("Login lub hasło jest niepoprawne"),
+    NO_PERMISSION("User has no permission for this operation"),
+    UNEXPECTED_ERROR("An unexpected error has occurred"),
+    INVALID_PARAMETERS("An invalid parameters were given");
 
     public final String label;
 

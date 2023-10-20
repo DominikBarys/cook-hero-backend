@@ -2,11 +2,13 @@ package com.barysdominik.gateway.service;
 
 import com.netflix.appinfo.InstanceInfo;
 import com.netflix.discovery.EurekaClient;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 @Service
 public class CarouselService {
     private final EurekaClient eurekaClient;
@@ -18,7 +20,7 @@ public class CarouselService {
         try {
             initAuthCarousel();
         } catch (NullPointerException e) {
-            //TODO do something
+            e.printStackTrace();
         }
         manageEvents();
     }
@@ -38,17 +40,18 @@ public class CarouselService {
     private void manageEvents() {
         eurekaClient.registerEventListener(event -> {
             initAuthCarousel();
+            log.info("Registered new services successfully");
         });
         eurekaClient.unregisterEventListener(event -> {
             try {
                 initAuthCarousel();
+                log.info("Unregistered services successfully");
             } catch (NullPointerException e) {
-                //TODO do something
+                log.error("Error while unregistering services");
             }
         });
     }
 
-    //TODO make unique exception for this
     private void initAuthCarousel() throws NullPointerException {
         instances = eurekaClient.getApplication("AUTH-SERVICE").getInstances();
     }

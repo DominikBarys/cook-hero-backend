@@ -4,26 +4,31 @@ import com.barysdominik.auth.entity.http.AuthResponse;
 import com.barysdominik.auth.entity.http.Code;
 import com.barysdominik.auth.entity.http.LoginResponse;
 import com.barysdominik.auth.entity.user.*;
-import com.barysdominik.auth.exception.DuplicateMailException;
-import com.barysdominik.auth.exception.DuplicateUsernameException;
-import com.barysdominik.auth.exception.UserDontExistException;
+import com.barysdominik.auth.exception.*;
 import com.barysdominik.auth.repository.UserRepository;
+import com.barysdominik.auth.repository.UserResetPasswordRepository;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.Arrays;
+import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserService {
@@ -34,14 +39,158 @@ public class UserService {
     private final AuthenticationManager authenticationManager;
     private final CookieService cookieService;
     private final EmailService emailService;
+    private final UserResetPasswordService userResetPasswordService;
+    private final UserResetPasswordRepository userResetPasswordRepository;
     @Value("${jwt.exp}")
     private int exp;
     @Value("${jwt.refresh}")
     private int refreshExp;
 
-    private User saveUser(User user) {
+    @Transactional
+    public void activate(String uuid) throws UserDontExistException {
+        User user = userRepository.findUserByUuid(uuid).orElse(null);
+        if (user != null) {
+            user.setLock(false);
+            user.setEnabled(true);
+            userRepository.save(user);
+            log.info("User with uuid: '" + uuid + "' activated successfully");
+            return;
+        }
+        log.error("User with uuid: '" + uuid + "' does not exist");
+        throw new UserDontExistException("User with uuid: '" + uuid + "' does not exist");
+    }
+
+    public ResponseEntity<?> autoLogin(HttpServletRequest request, HttpServletResponse response) {
+        try {
+            validateToken(request, response);
+            User user = getUserByRefreshToken(request);
+            if (user != null) {
+                log.info("User with username: '" + user.getUsername() + "' was auto logged successfully via token");
+                return ResponseEntity.ok(
+                        UserRegisterDTO
+                                .builder()
+                                .username(user.getUsername())
+                                .email(user.getEmail())
+                                .role(user.getRole())
+                                .rank(user.getRank())
+                                .build()
+                );
+            }
+            log.error("User with does not exist, is not enabled or is locked");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new AuthResponse(Code.LOGIN_FAILED));
+        } catch (IllegalArgumentException | ExpiredJwtException e) {
+            log.error("User tokens are null or expired");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new AuthResponse(Code.INVALID_TOKEN));
+        }
+    }
+
+    public User getUserByRefreshToken(HttpServletRequest request) {
+        String refresh = null;
+        for (Cookie value : Arrays.stream(request.getCookies()).toList()) {
+            if (value.getName().equals("refresh")) {
+                refresh = value.getValue();
+            }
+        }
+        String username = jwtService.getSubject(refresh);
+        return userRepository.findNonLockedAndEnabledUserByUsername(username).orElse(null);
+    }
+
+    public ResponseEntity<?> isLoggedIn(HttpServletRequest request, HttpServletResponse response) {
+        try {
+            validateToken(request, response);
+            log.info("User is logged in");
+            return ResponseEntity.ok(new LoginResponse(true));
+        } catch (IllegalArgumentException | ExpiredJwtException e) {
+            log.error("User is not logged in");
+            return ResponseEntity.ok(new LoginResponse(false));
+        }
+    }
+
+    public ResponseEntity<?> logout(HttpServletRequest request, HttpServletResponse response) {
+        Cookie cookie = cookieService.removeCookie(Arrays.stream(request.getCookies()).toList(), "token");
+        if (cookie != null) {
+            response.addCookie(cookie);
+        }
+        cookie = cookieService.removeCookie(Arrays.stream(request.getCookies()).toList(), "refresh");
+        if (cookie != null) {
+            response.addCookie(cookie);
+        }
+        log.info("Successfully logged out");
+        return ResponseEntity.ok(new AuthResponse(Code.SUCCESS));
+    }
+
+    @Transactional
+    public void register(UserRegisterDTO userRegisterDTO) throws DuplicateUsernameException, DuplicateMailException {
+        userRepository.findUserByUsername(userRegisterDTO.getUsername()).ifPresent(value -> {
+            log.error("Username '" + userRegisterDTO.getUsername() +"' already exists");
+            throw new DuplicateUsernameException("Użytkownik o takiej nazwie już istnieje");
+        });
+        userRepository.findUserByEmail(userRegisterDTO.getEmail()).ifPresent(value -> {
+            log.error("Email '" + userRegisterDTO.getEmail() +"' already exists");
+            throw new DuplicateMailException("Użytkownik o takim mailu już istnieje");
+        });
+
+        User user = new User();
+        user.setUsername(userRegisterDTO.getUsername());
+        user.setPassword(userRegisterDTO.getPassword());
+        user.setEmail(userRegisterDTO.getEmail());
+        user.setJoinedAt(LocalDate.now());
+        user.setRole(Role.USER);
+        user.setRank(Rank.ROOKIE);
+        user.setLock(true);
+        user.setEnabled(false);
+        saveUser(user);
+
+        emailService.sendAccountActivationMail(user);
+    }
+
+    protected User saveUser(User user) {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         return userRepository.saveAndFlush(user);
+    }
+
+    public ResponseEntity<?> login(HttpServletResponse response, User authRequest) {
+        User user = userRepository.findNonLockedAndEnabledUserByUsername(authRequest.getUsername()).orElse(null);
+        if (user != null) {
+            Authentication authentication;
+            try {
+                authentication = authenticationManager.authenticate(
+                        new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword())
+                );
+            } catch (AuthenticationException e) {
+                log.error("Login or password are incorrect");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new AuthResponse(Code.AUTHENTICATION_ERROR));
+            }
+
+            if (authentication.isAuthenticated()) {
+                Cookie refresh = cookieService.generateCookie(
+                        "refresh",
+                        generateToken(authRequest.getUsername(), refreshExp),
+                        refreshExp
+                );
+                Cookie token = cookieService.generateCookie(
+                        "token",
+                        generateToken(authRequest.getUsername(), exp),
+                        exp);
+                response.addCookie(refresh);
+                response.addCookie(token);
+                log.info("User with username: '" + user.getUsername() + "' has been logged in successfully");
+                return ResponseEntity.ok(
+                        UserRegisterDTO
+                                .builder()
+                                .username(user.getUsername())
+                                .email(user.getEmail())
+                                .role(user.getRole())
+                                .rank(user.getRank())
+                                .build()
+                );
+            } else {
+                log.error("User with username: '" + user.getUsername() + "' is not authenticated");
+                return ResponseEntity.ok(new AuthResponse(Code.LOGIN_FAILED));
+            }
+        }
+        log.error("User does not exist, is not enabled or is locked");
+        return ResponseEntity.ok(new AuthResponse(Code.USER_NOT_FOUND));
     }
 
     public String generateToken(String username, int exp) {
@@ -69,9 +218,9 @@ public class UserService {
         try {
             jwtService.validateToken(token);
         } catch (ExpiredJwtException | IllegalArgumentException e) {
+            log.warn("Token has expired, trying to validate via refresh token");
             jwtService.validateToken(refresh);
-            //to rzuca nulla jak zwykly token jest nullem, nie mozna go tez odnowic bo nie ma tutaj nazwy uzytkownika
-            //nieeeleganckim rozwiazaniem byloby zdobycie subjecta z refresha
+
             Cookie authorizationToken = cookieService.generateCookie(
                     "token",
                     jwtService.refreshToken(refresh, exp),
@@ -82,137 +231,115 @@ public class UserService {
                     jwtService.refreshToken(refresh, refreshExp),
                     refreshExp
             );
+
             response.addCookie(authorizationToken);
             response.addCookie(refreshToken);
+            log.info("Token validation passed successfully and tokens have been refreshed");
         }
     }
 
-    public void register(UserRegisterDTO userRegisterDTO) throws DuplicateUsernameException, DuplicateMailException {
-        userRepository.findUserByUsername(userRegisterDTO.getUsername()).ifPresent(value -> {
-            throw new DuplicateUsernameException("Użytkownik o takiej nazwie już istnieje");
-        });
-        userRepository.findUserByEmail(userRegisterDTO.getEmail()).ifPresent(value -> {
-            throw new DuplicateMailException("Użytkownik o takim mailu już istnieje");
-        });
-
-        User user = new User();
-        user.setUsername(userRegisterDTO.getUsername());
-        user.setPassword(userRegisterDTO.getPassword());
-        user.setEmail(userRegisterDTO.getEmail());
-        user.setRole(Role.USER);
-        user.setRank(Rank.ROOKIE);
-        user.setLock(true);
-        user.setEnabled(false);
-        saveUser(user);
-
-        emailService.sendAccountActivationMail(user);
-    }
-
-    public void activate(String uuid) throws UserDontExistException{
-        User user = userRepository.findUserByUuid(uuid).orElse(null);
-        if(user != null) {
-            user.setLock(false);
-            user.setEnabled(true);
-            userRepository.save(user);
-            return;
-        }
-        throw new UserDontExistException("User with uuid: '" + uuid + "' does not exist");
-    }
-
-    public ResponseEntity<?> login(HttpServletResponse response, User authRequest) {
-        User user = userRepository.findNonLockedAndEnabledUserByUsername(authRequest.getUsername()).orElse(null);
-        if (user != null) {
-            Authentication authentication = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword())
-            );
-            if (authentication.isAuthenticated()) {
-                Cookie refresh = cookieService.generateCookie(
-                        "refresh",
-                        generateToken(authRequest.getUsername(), refreshExp),
-                        refreshExp
-                );
-                Cookie token = cookieService.generateCookie(
-                        "token",
-                        generateToken(authRequest.getUsername(), exp),
-                        exp);
-                response.addCookie(refresh);
-                response.addCookie(token);
-                return ResponseEntity.ok(
-                        UserRegisterDTO
-                                .builder()
-                                .username(user.getUsername())
-                                .email(user.getEmail())
-                                .role(user.getRole())
-                                .rank(user.getRank())
-                                .build()
-                );
-            } else {
-                return ResponseEntity.ok(new AuthResponse(Code.LOGIN_FAILED));
-            }
-        }
-        return ResponseEntity.ok(new AuthResponse(Code.USER_NOT_FOUND));
-    }
-
-    public ResponseEntity<?> loginViaToken(HttpServletRequest request, HttpServletResponse response) {
-        try {
-            validateToken(request, response);
-            String refresh = null;
-            for (Cookie value : Arrays.stream(request.getCookies()).toList()) {
-                if (value.getName().equals("refresh")) {
-                    refresh = value.getValue();
-                }
-            }
-            String username = jwtService.getSubject(refresh);
-            User user = userRepository.findNonLockedAndEnabledUserByUsername(username).orElse(null);
-            if (user != null) {
-                return ResponseEntity.ok(
-                        UserRegisterDTO
-                                .builder()
-                                .username(user.getUsername())
-                                .email(user.getEmail())
-                                .role(user.getRole())
-                                .rank(user.getRank())
-                                .build()
-                );
-            }
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new AuthResponse(Code.LOGIN_FAILED));
-        } catch (IllegalArgumentException | ExpiredJwtException e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new AuthResponse(Code.INVALID_TOKEN));
-        }
-    }
-
-    public ResponseEntity<?> isLoggedIn(HttpServletRequest request, HttpServletResponse response) {
-        try {
-            validateToken(request, response);
-            return ResponseEntity.ok(new LoginResponse(true));
-        } catch (IllegalArgumentException | ExpiredJwtException e) {
-            return ResponseEntity.ok(new LoginResponse(false));
-        }
-    }
-
-    public void passwordRecovery(String email) throws UserDontExistException{
+    public void passwordRecovery(String email) throws UserDontExistException {
         User user = userRepository.findUserByEmail(email).orElse(null);
-        if(user != null) {
-            emailService.sendPasswordRecoveryMail(user);
+        if (user != null) {
+            UserResetPassword userResetPassword = userResetPasswordService.startResettingPassword(user);
+            emailService.sendPasswordRecoveryMail(user, userResetPassword.getUuid());
             return;
         }
+        log.error("User with email: '" + email + "' does not exist");
         throw new UserDontExistException("User with email: '" + email + "' does not exist");
     }
 
+    @Transactional
     public void resetPassword(ChangePasswordDTO changePasswordDTO) throws UserDontExistException {
-        User user = userRepository.findUserByUuid(changePasswordDTO.getUuid()).orElse(null);
-        if(user != null) {
-            user.setPassword(changePasswordDTO.getPassword());
-            saveUser(user);
-            return;
+        UserResetPassword userResetPassword = userResetPasswordRepository
+                .findByUuid(changePasswordDTO.getUuid())
+                .orElse(null);
+        if (userResetPassword != null) {
+            User user = userRepository.findUserByUuid(userResetPassword.getUser().getUuid()).orElse(null);
+            if (user != null) {
+                user.setPassword(changePasswordDTO.getPassword());
+                saveUser(user);
+                userResetPasswordService.endResettingPassword(userResetPassword.getUuid());
+                log.info("Password of user: '" + user.getUsername() + "' have been resetted successfully");
+                return;
+            }
         }
+        log.error("User with uuid: '" + changePasswordDTO.getUuid() +
+                "' does not exist or reset password uuid has expired");
         throw new UserDontExistException("User with uuid: '" + changePasswordDTO.getUuid() + "' does not exist");
     }
 
-    public void promoteUserToAdmin(UserRegisterDTO userRegisterDTO) {
-        userRepository.findUserByUsername(userRegisterDTO.getUsername()).ifPresent(value -> {
-            value.setRole(Role.ADMIN);
-            userRepository.save(value);
-        });
+    @Transactional
+    public void changeUsername(HttpServletRequest request, String newUsername) {
+        User user;
+        try{
+            user = getUserByRefreshToken(request);
+        } catch (Exception e) {
+            throw new CannotAuthorizeByTokenException("Tokens are null or expired");
+        }
+        user.setUsername(newUsername);
+        userRepository.save(user);
     }
+
+    @Transactional
+    public void changeRole(HttpServletRequest request, String role) {
+        User user;
+        try{
+            user = getUserByRefreshToken(request);
+        } catch (Exception e) {
+            throw new CannotAuthorizeByTokenException("Tokens are null or expired");
+        }
+
+        List<Role> roles = Arrays.stream(Role.values()).toList();
+
+        if(roles.stream().anyMatch(name -> name.toString().equals(role))) {
+            user.setRole(Role.valueOf(role));
+            userRepository.save(user);
+            log.info("User role changed successfully");
+            return;
+        }
+        throw new InvalidParamException("Given params are incorrect");
+    }
+
+    @Transactional
+    public void changeRank(HttpServletRequest request, String rank) {
+        User user;
+        try{
+            user = getUserByRefreshToken(request);
+        } catch (Exception e) {
+            throw new CannotAuthorizeByTokenException("Tokens are null or expired");
+        }
+
+        List<Rank> ranks = Arrays.stream(Rank.values()).toList();
+
+        if(ranks.stream().anyMatch(name -> name.toString().equals(rank))) {
+            user.setRank(Rank.valueOf(rank));
+            userRepository.save(user);
+            log.info("User role changed successfully");
+            return;
+        }
+        throw new InvalidParamException("Given params are incorrect");
+    }
+
+    @Transactional
+    public void deleteUser(HttpServletRequest request, HttpServletResponse response, String uuid) {
+        User user;
+        try{
+             user = getUserByRefreshToken(request);
+        } catch (Exception e) {
+            throw new CannotAuthorizeByTokenException("Tokens are null or expired");
+        }
+
+        if(user != null) {
+            if(user.getRole().toString().equals("ADMIN")) {
+                userResetPasswordRepository.deleteAllByUser(user);
+                userRepository.delete(user);
+                log.info("User with uuid: '" + uuid + "' deleted successfully");
+            } else {
+                log.error("User is not authorized for this operation");
+                throw new NoPermissionsException("User is not authorized for this operation");
+            }
+        }
+    }
+
 }

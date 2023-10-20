@@ -31,10 +31,10 @@ public class EmailConfiguration {
         this.password = password;
         this.smtpHost = smtpHost;
         this.smtpPort = smtpPort;
-        initConfiguration(smtpHost, smtpPort);
+        initConfiguration();
     }
 
-    private void initConfiguration(String host, int port) {
+    private void initConfiguration() {
         properties = new Properties();
         properties.put("mail.smtp.auth", "true");
         properties.put("mail.smtp.starttls.enable", "true");

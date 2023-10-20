@@ -7,12 +7,12 @@ import java.sql.Timestamp;
 @Getter
 public class LoginResponse {
     private final String timestamp;
-    private final boolean message;
+    private final boolean isLoggedIn;
     private final Code code;
 
     public LoginResponse(boolean message) {
         this.timestamp = String.valueOf(new Timestamp(System.currentTimeMillis()));
-        this.message = message;
+        this.isLoggedIn = message;
         this.code = Code.SUCCESS;
     }
 }

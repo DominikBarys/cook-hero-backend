@@ -3,6 +3,8 @@ package com.barysdominik.auth.service;
 import jakarta.servlet.http.Cookie;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class CookieService {
 
@@ -11,6 +13,17 @@ public class CookieService {
         cookie.setHttpOnly(true);
         cookie.setMaxAge(exp);
         return cookie;
+    }
+
+    public Cookie removeCookie(List<Cookie> cookieList, String name) {
+        for (Cookie cookie : cookieList) {
+            if(cookie.getName().equals(name)) {
+                cookie.setMaxAge(0);
+                cookie.setHttpOnly(true);
+                return cookie;
+            }
+        }
+        return null;
     }
 
 }

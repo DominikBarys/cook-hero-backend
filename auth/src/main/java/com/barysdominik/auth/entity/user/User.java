@@ -35,9 +35,9 @@ public class User implements UserDetails {
     private LocalDate joinedAt;
     private int amountOfCreatedTutorials;
     private int amountOfReviews;
-    @Column(name = "islock")
+    @Column(name = "islock", columnDefinition = "boolean default true")
     private boolean isLock;
-    @Column(name = "isenabled")
+    @Column(name = "isenabled", columnDefinition = "boolean default false")
     private boolean isEnabled;
 
     public User(){

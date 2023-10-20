@@ -3,6 +3,7 @@ package com.barysdominik.gateway.filter;
 import com.barysdominik.gateway.configuration.RouteValidator;
 import com.barysdominik.gateway.service.CarouselService;
 import com.barysdominik.gateway.service.JwtService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;
@@ -18,6 +19,7 @@ import org.springframework.http.*;
 import java.sql.Timestamp;
 import java.util.List;
 
+@Slf4j
 public class AuthenticationFilter extends AbstractGatewayFilterFactory<AuthenticationFilter.Config> {
 
     private final RouteValidator routeValidator;
@@ -57,6 +59,7 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
                             .append("\"code\": \"INVALID_TOKEN\"\n")
                             .append("}");
 
+                    log.error("Tokens are null or expired");
                     return exchange.getResponse().writeWith(Mono.just(exchange.getResponse()
                             .bufferFactory()
                             .wrap((stringBuilder.toString()).getBytes())));
@@ -68,6 +71,7 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
                 try {
                     if (profile.equals("test")){
                         //for testing purposes
+                        log.info("test profile, no need for authentication");
                         jwtService.validateToken(tokenCookie.getValue());
                     }else {
                         String cookies = new StringBuilder()
@@ -105,9 +109,12 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
                                                     .build());
                                 }
                             }
+                        } else {
+                            log.error("Cannot validate tokens");
                         }
                     }
                 } catch (Exception e) {
+                    log.error("An error in authentication filter has occurred");
                     exchange.getResponse().writeWith(
                             Flux.just(new DefaultDataBufferFactory().wrap(e.getMessage().getBytes()))
                     );
