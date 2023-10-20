@@ -19,6 +19,7 @@ public class CookieService {
         for (Cookie cookie : cookieList) {
             if(cookie.getName().equals(name)) {
                 cookie.setMaxAge(0);
+               // cookie.setPath("/");
                 cookie.setHttpOnly(true);
                 return cookie;
             }
