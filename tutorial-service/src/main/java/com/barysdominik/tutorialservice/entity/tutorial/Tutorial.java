@@ -22,7 +22,8 @@ public class Tutorial {
     @GeneratedValue(generator = "tutorial_id_seq", strategy = GenerationType.SEQUENCE)
     @SequenceGenerator(name = "tutorial_id_seq", sequenceName = "tutorial_id_seq", allocationSize = 1)
     private long id;
-    private BigDecimal price;
+    private String uuid;
+    private String name;
     @Column(nullable = false)
     private int timeToPrepare;
     @Column(nullable = false)
@@ -35,6 +36,10 @@ public class Tutorial {
     private String shortDescription;
     private String parameters;
     private int rating;
+    private boolean hasMeat;
+    private boolean isVeganRecipe;
+    private boolean isSweetRecipe;
+    private boolean isSpicyRecipe;
     @ManyToOne
     @JoinColumn(name = "dishId", referencedColumnName = "id")
     private Dish dish;
