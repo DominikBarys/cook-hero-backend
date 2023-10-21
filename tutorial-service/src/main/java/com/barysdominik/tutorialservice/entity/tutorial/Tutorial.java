@@ -29,13 +29,12 @@ public class Tutorial {
     @Column(nullable = false)
     private int difficulty;
     @Column(nullable = false)
-    private LocalDate creationDate;
+    private LocalDate creationDate;//def
     @Column(nullable = false)
     private List<String> imageUrls;
     @Column(nullable = false)
     private String shortDescription;
     private String parameters;
-    private int rating;
     private boolean hasMeat;
     private boolean isVeganRecipe;
     private boolean isSweetRecipe;
