@@ -1,7 +1,5 @@
 package com.barysdominik.auth.entity.http;
 
-import lombok.Builder;
-import lombok.Data;
 import lombok.Getter;
 
 import java.sql.Timestamp;

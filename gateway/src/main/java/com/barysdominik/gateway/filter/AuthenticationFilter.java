@@ -8,18 +8,19 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;
 import org.springframework.core.io.buffer.DefaultDataBufferFactory;
-import org.springframework.http.HttpCookie;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
+import org.springframework.http.*;
+import org.springframework.http.server.reactive.ServerHttpResponse;
+import org.springframework.stereotype.Component;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import org.springframework.http.*;
 
 import java.sql.Timestamp;
 import java.util.List;
 
 @Slf4j
+@Component
 public class AuthenticationFilter extends AbstractGatewayFilterFactory<AuthenticationFilter.Config> {
 
     private final RouteValidator routeValidator;
@@ -86,11 +87,12 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
                         HttpHeaders httpHeaders = new HttpHeaders();
                         httpHeaders.add("Cookie",cookies);
                         HttpEntity<Object> entity = new HttpEntity<>(httpHeaders);
-                        ResponseEntity<String> response = restTemplate.exchange(
-                                "http://"+carouselService.getUriAuth()+"/api/v1/auth/validate",
-                                HttpMethod.GET,entity,
-                                String.class
-                        );
+                        ResponseEntity<String> response;
+                        if (routeValidator.isAdmin.test(exchange.getRequest())){
+                            response = restTemplate.exchange("http://" + carouselService.getUriAuth()+"/api/v1/auth/authorize", HttpMethod.GET,entity, String.class);
+                        }else {
+                            response = restTemplate.exchange("http://" + carouselService.getUriAuth() + "/api/v1/auth/validate", HttpMethod.GET, entity, String.class);
+                        }
 
                         //przepisywanie cookiesa
                         if(response.getStatusCode() == HttpStatus.OK) {
@@ -113,11 +115,16 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
                             log.error("Cannot validate tokens");
                         }
                     }
-                } catch (Exception e) {
+                } catch (HttpClientErrorException e) {
                     log.error("An error in authentication filter has occurred");
-                    exchange.getResponse().writeWith(
-                            Flux.just(new DefaultDataBufferFactory().wrap(e.getMessage().getBytes()))
-                    );
+                    String message  = e.getMessage().substring(7);
+                    message = message.substring(0,message.length()-1);
+                    ServerHttpResponse response = exchange.getResponse();
+                    HttpHeaders headers = response.getHeaders();
+                    headers.setContentType(MediaType.APPLICATION_JSON);
+                    response.setStatusCode(HttpStatus.UNAUTHORIZED);
+                    return exchange.getResponse().writeWith(Flux.just(new DefaultDataBufferFactory().wrap(message.getBytes())));
+
                 }
             }
             //tutaj trafiamy od razu jezeli endpoint nie znajduje sie na liscie wymagajacej autoryzacji

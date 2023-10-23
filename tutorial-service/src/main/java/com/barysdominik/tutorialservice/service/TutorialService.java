@@ -8,11 +8,21 @@ import com.barysdominik.tutorialservice.repository.UserRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.criteria.*;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
+import java.io.IOException;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -23,6 +33,8 @@ public class TutorialService {
     private final DishRepository dishRepository;
     private final CategoryRepository categoryRepository;
     private final UserRepository userRepository;
+    @Value("${external.url.file-service}")
+    private String FILE_SERVICE_EXTERNAL_URL;
 
     //na ich podstawie bedzie potem sortowanie
 //    Integer timeToPrepare,
@@ -36,8 +48,8 @@ public class TutorialService {
 
     public long countSearchedResults(
             String name,
-            String dishUuid,
-            String categoryUuid,
+            String dishShortId,
+            String categoryShortId,
             String authorUuid,
             boolean hasMeat,
             boolean isVeganRecipe,
@@ -49,8 +61,8 @@ public class TutorialService {
         Root<Tutorial> root = query.from(Tutorial.class);
         List<Predicate> predicates = prepareQuery(
                 name,
-                dishUuid,
-                categoryUuid,
+                dishShortId,
+                categoryShortId,
                 authorUuid,
                 hasMeat,
                 isVeganRecipe,
@@ -68,10 +80,10 @@ public class TutorialService {
             int limit,
             String sort,
             String order,
-            String uuid,
+            String shortId,
             String name,
-            String dishUuid,
-            String categoryUuid,
+            String dishShortId,
+            String categoryShortId,
             String authorUuid,
             boolean hasMeat,
             boolean isVeganRecipe,
@@ -82,8 +94,8 @@ public class TutorialService {
         CriteriaQuery<Tutorial> query = criteriaBuilder.createQuery(Tutorial.class);
         Root<Tutorial> root = query.from(Tutorial.class);
 
-        if (uuid != null) {
-            return tutorialRepository.findTutorialByUuid(uuid).stream().toList();
+        if (shortId != null) {
+            return tutorialRepository.findTutorialByShortId(shortId).stream().toList();
         }
 
         if (page <= 0) {
@@ -92,8 +104,8 @@ public class TutorialService {
 
         List<Predicate> predicates = prepareQuery(
                 name,
-                dishUuid,
-                categoryUuid,
+                dishShortId,
+                categoryShortId,
                 authorUuid,
                 hasMeat,
                 isVeganRecipe,
@@ -110,7 +122,7 @@ public class TutorialService {
                 default -> "creationDate";
             };
             Order orderQuery;
-            if(order.equals("desc")) {
+            if (order.equals("desc")) {
                 orderQuery = criteriaBuilder.desc(root.get(column));
             } else {
                 orderQuery = criteriaBuilder.asc(root.get(column));
@@ -124,8 +136,8 @@ public class TutorialService {
 
     public List<Predicate> prepareQuery(
             String name,
-            String dishUuid,
-            String categoryUuid,
+            String dishShortId,
+            String categoryShortId,
             String authorUuid,
             boolean hasMeat,
             boolean isVeganRecipe,
@@ -140,14 +152,14 @@ public class TutorialService {
             predicates.add(criteriaBuilder.like(criteriaBuilder.lower(root.get("name")), "%" + name.toLowerCase() + "%"));
         }
 
-        if (dishUuid != null && !dishUuid.trim().isEmpty()) {
-            dishRepository.findDishByUuid(dishUuid).ifPresent(
+        if (dishShortId != null && !dishShortId.trim().isEmpty()) {
+            dishRepository.findDishByShortId(dishShortId).ifPresent(
                     value -> predicates.add(criteriaBuilder.equal(root.get("dish"), value))
             );
         }
 
-        if (categoryUuid != null && !categoryUuid.trim().isEmpty()) {
-            categoryRepository.findCategoryByUuid(categoryUuid).ifPresent(
+        if (categoryShortId != null && !categoryShortId.trim().isEmpty()) {
+            categoryRepository.findCategoryByShortId(categoryShortId).ifPresent(
                     value -> predicates.add(criteriaBuilder.equal(root.get("category"), value))
             );
         }
@@ -175,6 +187,49 @@ public class TutorialService {
         }
 
         return predicates;
+    }
+
+    @Transactional
+    public void createTutorial(Tutorial tutorial) {
+        tutorial.setCreationDate(LocalDate.now());
+        tutorial.setShortId(UUID.randomUUID().toString().replace("-", "").substring(0, 12));
+        tutorialRepository.save(tutorial);
+
+        for (String shortId : tutorial.getImageUrls()) {
+            activateImage(shortId);
+        }
+    }
+
+    public void activateImage(String shortId) {
+        HttpRequest httpRequest = HttpRequest.newBuilder()
+                .uri(URI.create(FILE_SERVICE_EXTERNAL_URL + "?shortId=" + shortId))
+                .method("PATCH", HttpRequest.BodyPublishers.noBody())
+                .build();
+
+        try {
+            HttpClient.newHttpClient().send(httpRequest, HttpResponse.BodyHandlers.ofString());
+        } catch (IOException | InterruptedException e) {
+            throw new RuntimeException("An unexpected error has occurred");
+        }
+    }
+
+    public void delete(String shortId) {
+        tutorialRepository.findTutorialByShortId(shortId).ifPresentOrElse(
+                value -> {
+                    tutorialRepository.save(value);
+                    for(String imageUrl : value.getImageUrls()) {
+                        deleteImage(imageUrl);
+                    }
+                },
+                () -> {
+                    throw new RuntimeException("An unexpected error has occurred");
+                }
+        );
+    }
+
+    private void deleteImage(String shortId) {
+        RestTemplate restTemplate = new RestTemplate();
+        restTemplate.delete(FILE_SERVICE_EXTERNAL_URL + "?shortId=" + shortId);
     }
 
     public long countTutorials() {

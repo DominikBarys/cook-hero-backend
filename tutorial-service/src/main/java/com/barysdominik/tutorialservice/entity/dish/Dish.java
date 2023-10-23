@@ -20,5 +20,5 @@ public class Dish {
     private long id;
     @Column(nullable = false)
     private String name;
-    private String uuid;
+    private String shortId;
 }

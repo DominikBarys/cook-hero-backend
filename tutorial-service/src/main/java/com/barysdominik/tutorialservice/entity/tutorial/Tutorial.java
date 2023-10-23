@@ -5,9 +5,11 @@ import com.barysdominik.tutorialservice.entity.dish.Dish;
 import com.barysdominik.tutorialservice.entity.ingredient.Ingredient;
 import com.barysdominik.tutorialservice.entity.user.User;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -22,7 +24,7 @@ public class Tutorial {
     @GeneratedValue(generator = "tutorial_id_seq", strategy = GenerationType.SEQUENCE)
     @SequenceGenerator(name = "tutorial_id_seq", sequenceName = "tutorial_id_seq", allocationSize = 1)
     private long id;
-    private String uuid;
+    private String shortId;
     private String name;
     @Column(nullable = false)
     private int timeToPrepare;
@@ -31,7 +33,7 @@ public class Tutorial {
     @Column(nullable = false)
     private LocalDate creationDate;//def
     @Column(nullable = false)
-    private List<String> imageUrls;
+    private String[] imageUrls;
     @Column(nullable = false)
     private String shortDescription;
     private String parameters;

@@ -14,12 +14,12 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
-import org.springframework.security.core.Authentication;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -102,7 +102,7 @@ public class UserService {
             return ResponseEntity.ok(new LoginResponse(true));
         } catch (IllegalArgumentException | ExpiredJwtException e) {
             log.error("User is not logged in");
-            return ResponseEntity.ok(new LoginResponse(false));
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new LoginResponse(false));
         }
     }
 
@@ -339,6 +339,30 @@ public class UserService {
                 log.error("User is not authorized for this operation");
                 throw new NoPermissionsException("User is not authorized for this operation");
             }
+        }
+    }
+
+    public void authorize(HttpServletRequest request) throws UserDontExistException {
+        String token = null;
+        String refresh = null;
+        if(request.getCookies() != null) {
+            for (Cookie value : Arrays.stream(request.getCookies()).toList()) {
+                if (value.getName().equals("token")) {
+                    token = value.getValue();
+                } else if (value.getName().equals("refresh")) {
+                    refresh = value.getValue();
+                }
+            }
+        } else {
+            throw new CannotAuthorizeByTokenException("Tokens are null or expired");
+        }
+
+        if (token != null && !token.isEmpty()){
+            String subject = jwtService.getSubject(token);
+            userRepository.findAdmin(subject).orElseThrow(()->new UserDontExistException("User not found"));
+        } else if (refresh != null && !refresh.isEmpty()) {
+            String subject = jwtService.getSubject(refresh);
+            userRepository.findAdmin(subject).orElseThrow(()->new UserDontExistException("User not found"));
         }
     }
 

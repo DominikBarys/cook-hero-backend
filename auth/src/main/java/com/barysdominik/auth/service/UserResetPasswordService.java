@@ -1,6 +1,5 @@
 package com.barysdominik.auth.service;
 
-import com.barysdominik.auth.entity.user.ResetPasswordDTO;
 import com.barysdominik.auth.entity.user.User;
 import com.barysdominik.auth.entity.user.UserResetPassword;
 import com.barysdominik.auth.repository.UserResetPasswordRepository;
@@ -8,7 +7,6 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.EnableScheduling;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;

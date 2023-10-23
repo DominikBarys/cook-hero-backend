@@ -9,17 +9,19 @@ import java.util.List;
 public class CookieService {
 
     public Cookie generateCookie(String name, String value, int exp) {
-        Cookie cookie = new Cookie(name, value);
-        cookie.setHttpOnly(true);
+        Cookie cookie = new Cookie(name,value);
+        cookie.setHttpOnly(false);
+        cookie.setPath("/");
         cookie.setMaxAge(exp);
+        cookie.setHttpOnly(true);
         return cookie;
+
     }
 
     public Cookie removeCookie(List<Cookie> cookieList, String name) {
         for (Cookie cookie : cookieList) {
             if(cookie.getName().equals(name)) {
                 cookie.setMaxAge(0);
-               // cookie.setPath("/");
                 cookie.setHttpOnly(true);
                 return cookie;
             }

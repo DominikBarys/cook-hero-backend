@@ -1,12 +1,11 @@
 package com.barysdominik.tutorialservice.facade;
 
+import com.barysdominik.tutorialservice.entity.http.Response;
+import com.barysdominik.tutorialservice.entity.tutorial.TutorialFormDTO;
 import com.barysdominik.tutorialservice.mediator.TutorialMediator;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -15,13 +14,13 @@ public class TutorialController {
 
     private final TutorialMediator tutorialMediator;
 
+    @GetMapping
     public ResponseEntity<?> get(
-            HttpServletRequest request,
             @RequestParam(required = false,defaultValue = "1") int _page,
             @RequestParam(required = false,defaultValue = "5") int _limit,
             @RequestParam(required = false, defaultValue = "creationDate") String _sort,
             @RequestParam(required = false, defaultValue = "desc") String _order,
-            @RequestParam(required = false) String _uuid,
+            @RequestParam(required = false) String _shortId,
             @RequestParam(required = false) String name_like,
             @RequestParam(required = false) String _dish,
             @RequestParam(required = false) String _category,
@@ -36,7 +35,7 @@ public class TutorialController {
                _limit,
                _sort,
                _order,
-               _uuid,
+               _shortId,
                name_like,
                _dish,
                _category,
@@ -46,6 +45,16 @@ public class TutorialController {
                _isSweetRecipe,
                _isSpicyRecipe
        );
+    }
+
+    @PostMapping
+    public ResponseEntity<Response> saveTutorial(@RequestBody TutorialFormDTO tutorialDTO) {
+        return tutorialMediator.saveTutorial(tutorialDTO);
+    }
+
+    @DeleteMapping
+    public ResponseEntity<Response> deleteTutorial(@RequestParam String shortId) {
+        return tutorialMediator.deleteTutorial(shortId);
     }
 
 }

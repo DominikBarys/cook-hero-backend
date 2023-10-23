@@ -4,6 +4,7 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/CookHero.iml" filepath="$PROJECT_DIR$/CookHero.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/auth.main.iml" filepath="$PROJECT_DIR$/.idea/modules/auth.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/file-service.main.iml" filepath="$PROJECT_DIR$/.idea/modules/file-service.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/gateway.main.iml" filepath="$PROJECT_DIR$/.idea/modules/gateway.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/tutorial-service.main.iml" filepath="$PROJECT_DIR$/.idea/modules/tutorial-service.main.iml" />
     </modules>

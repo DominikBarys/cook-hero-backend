@@ -1,6 +1,5 @@
 package com.barysdominik.auth.configuration;
 
-import com.barysdominik.auth.entity.user.Role;
 import com.barysdominik.auth.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -9,7 +8,6 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -45,7 +43,8 @@ public class UserConfiguration {
                         "/api/v1/auth/change-username",
                         "/api/v1/auth/change-role",
                         "/api/v1/auth/change-rank",
-                        "/api/v1/auth/delete"
+                        "/api/v1/auth/delete",
+                        "/api/v1/auth/authorize"
                         ).permitAll()
                 .and()
                 .build();

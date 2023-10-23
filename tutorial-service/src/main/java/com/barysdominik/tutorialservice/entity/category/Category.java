@@ -14,11 +14,12 @@ import lombok.Setter;
 @AllArgsConstructor
 @Table(name = "category")
 public class Category {
+    //TODO change all uuids except user to shortUuid
     @Id
     @GeneratedValue(generator = "category_id_seq", strategy = GenerationType.SEQUENCE)
     @SequenceGenerator(name = "category_id_seq", sequenceName = "category_id_seq", allocationSize = 1)
     private long id;
-    private String uuid;
+    private String shortId;
     @Column(nullable = false)
     private String name;
 }

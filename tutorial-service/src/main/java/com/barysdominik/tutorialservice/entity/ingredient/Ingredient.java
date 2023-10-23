@@ -22,6 +22,7 @@ public class Ingredient {
     private long id;
     @Column(nullable = false)
     private String name;
+    private String shortId;
     @ManyToMany(mappedBy = "mainIngredients")
     private List<Tutorial> tutorials;
 }

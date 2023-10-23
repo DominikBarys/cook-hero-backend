@@ -11,15 +11,14 @@ import com.barysdominik.auth.exception.*;
 import com.barysdominik.auth.service.UserService;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
-import jakarta.servlet.http.HttpServletResponse;
 
 @Slf4j
 @RestController
@@ -176,6 +175,24 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
                     new AuthResponse(Code.INVALID_TOKEN)
             );
+        }
+    }
+
+    @GetMapping("/authorize")
+    public ResponseEntity<AuthResponse> authorize(
+            HttpServletRequest httpServletRequest,
+            HttpServletResponse httpServletResponse
+    ) {
+        try {
+            userService.validateToken(httpServletRequest, httpServletResponse);
+            userService.authorize(httpServletRequest);
+            return ResponseEntity.ok(new AuthResponse(Code.PERMIT));
+        }catch (IllegalArgumentException | ExpiredJwtException e){
+            log.info("Token is not correct");
+            return ResponseEntity.status(401).body(new AuthResponse(Code.INVALID_TOKEN));
+        }catch (UserDontExistException e1){
+            log.info("User dont exist");
+            return ResponseEntity.status(401).body(new AuthResponse(Code.USER_DO_NOT_EXISTS_OR_ACCOUNT_NOT_ACTIVATED));
         }
     }
 
