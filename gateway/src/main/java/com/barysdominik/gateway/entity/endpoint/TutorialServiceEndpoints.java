@@ -18,10 +18,11 @@ public class TutorialServiceEndpoints {
     private final RouteValidator routeValidator;
 
     private final List<Endpoint> endpointList = new ArrayList<>(List.of(
-            new Endpoint("/api/v1/product", HttpMethod.GET, Role.GUEST),
-            new Endpoint("/api/v1/product", HttpMethod.POST, Role.ADMIN),
-            new Endpoint("/api/v1/product", HttpMethod.DELETE, Role.ADMIN),
+            new Endpoint("/api/v1/tutorial", HttpMethod.GET, Role.GUEST),
+            new Endpoint("/api/v1/tutorial", HttpMethod.POST, Role.ADMIN),
+            new Endpoint("/api/v1/tutorial", HttpMethod.DELETE, Role.ADMIN),
             new Endpoint("/api/v1/category", HttpMethod.GET, Role.GUEST),
+            new Endpoint("/api/v1/category/all", HttpMethod.GET, Role.GUEST),
             new Endpoint("/api/v1/category", HttpMethod.POST, Role.ADMIN)
     ));
 

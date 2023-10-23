@@ -1,4 +1,4 @@
-package com.barysdominik.tutorialservice.mapper;
+package com.barysdominik.tutorialservice.mapper.category;
 
 import com.barysdominik.tutorialservice.entity.category.Category;
 import com.barysdominik.tutorialservice.entity.category.CategoryDTO;

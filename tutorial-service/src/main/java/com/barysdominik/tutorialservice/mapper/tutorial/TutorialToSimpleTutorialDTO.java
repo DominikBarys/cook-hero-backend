@@ -1,4 +1,4 @@
-package com.barysdominik.tutorialservice.mapper;
+package com.barysdominik.tutorialservice.mapper.tutorial;
 
 import com.barysdominik.tutorialservice.entity.tutorial.SimpleTutorialDTO;
 import com.barysdominik.tutorialservice.entity.tutorial.Tutorial;

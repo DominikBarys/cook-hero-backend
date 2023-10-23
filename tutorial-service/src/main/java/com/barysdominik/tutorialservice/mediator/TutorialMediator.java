@@ -5,9 +5,9 @@ import com.barysdominik.tutorialservice.entity.tutorial.SimpleTutorialDTO;
 import com.barysdominik.tutorialservice.entity.tutorial.Tutorial;
 import com.barysdominik.tutorialservice.entity.tutorial.TutorialDTO;
 import com.barysdominik.tutorialservice.entity.tutorial.TutorialFormDTO;
-import com.barysdominik.tutorialservice.mapper.TutorialFormDTOToTutorial;
-import com.barysdominik.tutorialservice.mapper.TutorialToSimpleTutorialDTO;
-import com.barysdominik.tutorialservice.mapper.TutorialToTutorialDTO;
+import com.barysdominik.tutorialservice.mapper.tutorial.TutorialFormDTOToTutorial;
+import com.barysdominik.tutorialservice.mapper.tutorial.TutorialToSimpleTutorialDTO;
+import com.barysdominik.tutorialservice.mapper.tutorial.TutorialToTutorialDTO;
 import com.barysdominik.tutorialservice.service.CategoryService;
 import com.barysdominik.tutorialservice.service.TutorialService;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +25,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class TutorialMediator {
 
-    //TODO form to product entity
     private final TutorialService tutorialService;
     private final TutorialToSimpleTutorialDTO tutorialToSimpleTutorialDTO;
     private final CategoryService categoryService;
