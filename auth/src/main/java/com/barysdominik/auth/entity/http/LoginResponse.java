@@ -10,9 +10,9 @@ public class LoginResponse {
     private final boolean isLoggedIn;
     private final Code code;
 
-    public LoginResponse(boolean message) {
+    public LoginResponse(boolean message, Code code) {
         this.timestamp = String.valueOf(new Timestamp(System.currentTimeMillis()));
         this.isLoggedIn = message;
-        this.code = Code.SUCCESS;
+        this.code = code;
     }
 }

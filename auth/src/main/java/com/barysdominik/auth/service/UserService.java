@@ -99,10 +99,10 @@ public class UserService {
         try {
             validateToken(request, response);
             log.info("User is logged in");
-            return ResponseEntity.ok(new LoginResponse(true));
+            return ResponseEntity.ok(new LoginResponse(true, Code.SUCCESS));
         } catch (IllegalArgumentException | ExpiredJwtException e) {
             log.error("User is not logged in");
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new LoginResponse(false));
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new LoginResponse(false, Code.LOGIN_FAILED));
         }
     }
 
@@ -218,6 +218,7 @@ public class UserService {
         try {
             jwtService.validateToken(token);
         } catch (ExpiredJwtException | IllegalArgumentException e) {
+            //TODO tutaj sie trafia zawsze, prowadzi tu gateway, wiec odswiezanie wystarczy tylko tu, ewentualnie jeszcze w authorize
             log.warn("Token has expired, trying to validate via refresh token");
             jwtService.validateToken(refresh);
 
@@ -331,14 +332,10 @@ public class UserService {
         }
 
         if(user != null) {
-            if(user.getRole().toString().equals("ADMIN")) {
-                userResetPasswordRepository.deleteAllByUser(user);
-                userRepository.delete(user);
-                log.info("User with uuid: '" + uuid + "' deleted successfully");
-            } else {
-                log.error("User is not authorized for this operation");
-                throw new NoPermissionsException("User is not authorized for this operation");
-            }
+            userResetPasswordRepository.deleteAllByUser(user);
+            userRepository.delete(user);
+            log.info("User with uuid: '" + uuid + "' deleted successfully");
+
         }
     }
 
@@ -359,10 +356,14 @@ public class UserService {
 
         if (token != null && !token.isEmpty()){
             String subject = jwtService.getSubject(token);
-            userRepository.findAdmin(subject).orElseThrow(()->new UserDontExistException("User not found"));
+            userRepository.findAdmin(subject).orElseThrow(
+                    ()->new NoPermissionsException("User has no permission for this operation")
+            );
         } else if (refresh != null && !refresh.isEmpty()) {
             String subject = jwtService.getSubject(refresh);
-            userRepository.findAdmin(subject).orElseThrow(()->new UserDontExistException("User not found"));
+            userRepository.findAdmin(subject).orElseThrow(
+                    ()->new NoPermissionsException("User has no permission for this operation")
+            );
         }
     }
 

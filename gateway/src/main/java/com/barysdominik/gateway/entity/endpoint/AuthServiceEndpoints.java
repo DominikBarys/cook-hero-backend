@@ -27,8 +27,8 @@ public class AuthServiceEndpoints {
             new Endpoint("/auth/reset-password", HttpMethod.POST, Role.GUEST),
             new Endpoint("/api/v1/auth/auto-login", HttpMethod.GET, Role.GUEST),
             new Endpoint("/api/v1/auth/change-username", HttpMethod.PATCH, Role.GUEST),
-            new Endpoint("/api/v1/auth/change-role", HttpMethod.PATCH, Role.GUEST),
-            new Endpoint("/api/v1/auth/change-rank", HttpMethod.PATCH, Role.GUEST),
+            new Endpoint("/api/v1/auth/change-role", HttpMethod.PATCH, Role.ADMIN),
+            new Endpoint("/api/v1/auth/change-rank", HttpMethod.PATCH, Role.GUEST),//TODO this will be removed as endpoint
             new Endpoint("/api/v1/auth/logged-in", HttpMethod.GET, Role.GUEST),
             new Endpoint("/auth/delete", HttpMethod.DELETE, Role.ADMIN)
     ));

@@ -2,7 +2,6 @@ package com.barysdominik.gateway.filter;
 
 import com.barysdominik.gateway.configuration.RouteValidator;
 import com.barysdominik.gateway.service.CarouselService;
-import com.barysdominik.gateway.service.JwtService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
@@ -25,20 +24,15 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
 
     private final RouteValidator routeValidator;
     private final RestTemplate restTemplate;
-    private final JwtService jwtService;
-    private CarouselService carouselService;
-    @Value("${spring.profiles.active}")
-    private String profile;
+    private final CarouselService carouselService;
 
     public AuthenticationFilter(
-            JwtService jwtService,
             RestTemplate restTemplate,
             RouteValidator routeValidator,
             CarouselService carouselService
     ) {
         super(Config.class);
         this.carouselService = carouselService;
-        this.jwtService = jwtService;
         this.restTemplate = restTemplate;
         this.routeValidator = routeValidator;
     }
@@ -70,50 +64,44 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
                 HttpCookie refreshCookie = exchange.getRequest().getCookies().get("refresh").get(0);
 
                 try {
-                    if (profile.equals("test")){
-                        //for testing purposes
-                        log.info("test profile, no need for authentication");
-                        jwtService.validateToken(tokenCookie.getValue());
+                    String cookies = new StringBuilder()
+                            .append(tokenCookie.getName())
+                            .append("=")
+                            .append(tokenCookie.getValue())
+                            .append(";")
+                            .append(refreshCookie.getName())
+                            .append("=")
+                            .append(refreshCookie.getValue()).toString();
+
+                    HttpHeaders httpHeaders = new HttpHeaders();
+                    httpHeaders.add("Cookie",cookies);
+                    HttpEntity<Object> entity = new HttpEntity<>(httpHeaders);
+                    ResponseEntity<String> response;
+                    if (routeValidator.isAdmin.test(exchange.getRequest())){
+                        response = restTemplate.exchange("http://" + carouselService.getUriAuth()+"/api/v1/auth/authorize", HttpMethod.GET,entity, String.class);
                     }else {
-                        String cookies = new StringBuilder()
-                                .append(tokenCookie.getName())
-                                .append("=")
-                                .append(tokenCookie.getValue())
-                                .append(";")
-                                .append(refreshCookie.getName())
-                                .append("=")
-                                .append(refreshCookie.getValue()).toString();
+                        response = restTemplate.exchange("http://" + carouselService.getUriAuth() + "/api/v1/auth/validate", HttpMethod.GET, entity, String.class);
+                    }
 
-                        HttpHeaders httpHeaders = new HttpHeaders();
-                        httpHeaders.add("Cookie",cookies);
-                        HttpEntity<Object> entity = new HttpEntity<>(httpHeaders);
-                        ResponseEntity<String> response;
-                        if (routeValidator.isAdmin.test(exchange.getRequest())){
-                            response = restTemplate.exchange("http://" + carouselService.getUriAuth()+"/api/v1/auth/authorize", HttpMethod.GET,entity, String.class);
-                        }else {
-                            response = restTemplate.exchange("http://" + carouselService.getUriAuth() + "/api/v1/auth/validate", HttpMethod.GET, entity, String.class);
-                        }
-
-                        //przepisywanie cookiesa
-                        if(response.getStatusCode() == HttpStatus.OK) {
-                            List<String> cookiesList = response.getHeaders().get(HttpHeaders.SET_COOKIE);
-                            if(cookiesList != null) {
-                                List<java.net.HttpCookie> httpCookie = java.net.HttpCookie.parse(cookiesList.get(0));
-                                for (java.net.HttpCookie cookie: httpCookie){
-                                    exchange.getResponse().getCookies().add(cookie.getName(),
-                                            //tworzenie response cookiesa z jakiegos juz istniejacego
-                                            ResponseCookie.from(cookie.getName(),cookie.getValue())
-                                                    .domain(cookie.getDomain())
-                                                    .path(cookie.getPath())
-                                                    .maxAge(cookie.getMaxAge())
-                                                    .secure(cookie.getSecure())
-                                                    .httpOnly(cookie.isHttpOnly())
-                                                    .build());
-                                }
+                    //przepisywanie cookiesa
+                    if(response.getStatusCode() == HttpStatus.OK) {
+                        List<String> cookiesList = response.getHeaders().get(HttpHeaders.SET_COOKIE);
+                        if(cookiesList != null) {
+                            List<java.net.HttpCookie> httpCookie = java.net.HttpCookie.parse(cookiesList.get(0));
+                            for (java.net.HttpCookie cookie: httpCookie){
+                                exchange.getResponse().getCookies().add(cookie.getName(),
+                                        //tworzenie response cookiesa z jakiegos juz istniejacego
+                                        ResponseCookie.from(cookie.getName(),cookie.getValue())
+                                                .domain(cookie.getDomain())
+                                                .path(cookie.getPath())
+                                                .maxAge(cookie.getMaxAge())
+                                                .secure(cookie.getSecure())
+                                                .httpOnly(cookie.isHttpOnly())
+                                                .build());
                             }
-                        } else {
-                            log.error("Cannot validate tokens");
                         }
+                    } else {
+                        log.error("Cannot validate tokens");
                     }
                 } catch (HttpClientErrorException e) {
                     log.error("An error in authentication filter has occurred");

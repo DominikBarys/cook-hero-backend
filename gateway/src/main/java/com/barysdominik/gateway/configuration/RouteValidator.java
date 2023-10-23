@@ -14,6 +14,7 @@ import java.util.function.Predicate;
 @Component
 public class RouteValidator {
 
+    //TODO make user endpoints
     public Set<Endpoint> openApiEndpoints = new HashSet<>();
 
     private Set<Endpoint> adminEndpoints = new HashSet<>();
@@ -27,10 +28,6 @@ public class RouteValidator {
                 openApiEndpoints.add(endpoint);
             }
         }
-        adminEndpoints.forEach(value->{
-            System.out.println(value.getUrl());
-            System.out.println(value.getHttpMethod());
-        });
     }
 
     public Predicate<ServerHttpRequest> isAdmin =
@@ -48,6 +45,4 @@ public class RouteValidator {
                             .getPath()
                             .contains(value.getUrl())
                             && request.getMethod().name().equals(value.getHttpMethod().name()));
-
-
 }

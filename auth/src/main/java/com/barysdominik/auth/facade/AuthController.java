@@ -167,10 +167,6 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
                     new AuthResponse(Code.USER_DO_NOT_EXISTS_OR_ACCOUNT_NOT_ACTIVATED)
             );
-        } catch (NoPermissionsException ex) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
-                    new AuthResponse(Code.NO_PERMISSION)
-            );
         } catch (CannotAuthorizeByTokenException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
                     new AuthResponse(Code.INVALID_TOKEN)
@@ -190,9 +186,9 @@ public class AuthController {
         }catch (IllegalArgumentException | ExpiredJwtException e){
             log.info("Token is not correct");
             return ResponseEntity.status(401).body(new AuthResponse(Code.INVALID_TOKEN));
-        }catch (UserDontExistException e1){
+        }catch (NoPermissionsException e1){
             log.info("User dont exist");
-            return ResponseEntity.status(401).body(new AuthResponse(Code.USER_DO_NOT_EXISTS_OR_ACCOUNT_NOT_ACTIVATED));
+            return ResponseEntity.status(401).body(new AuthResponse(Code.NO_PERMISSION));
         }
     }
 
