@@ -36,8 +36,4 @@ public class CategoryService {
         category.setShortId(UUID.randomUUID().toString().replace("-", "").substring(0, 12));
         categoryRepository.save(category);
     }
-
-    public Optional<Category> getCategories(String shortId) {
-        return categoryRepository.findCategoryByShortId(shortId);
-    }
 }
