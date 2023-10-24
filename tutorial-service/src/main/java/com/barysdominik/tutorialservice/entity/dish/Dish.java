@@ -13,7 +13,6 @@ import lombok.Setter;
 @AllArgsConstructor
 @Table(name = "dish")
 public class Dish {
-    //TODO uuid
     @Id
     @GeneratedValue(generator = "dish_id_seq", strategy = GenerationType.SEQUENCE)
     @SequenceGenerator(name = "dish_id_seq", sequenceName = "dish_id_seq", allocationSize = 1)

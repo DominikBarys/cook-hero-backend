@@ -7,4 +7,5 @@ import java.util.Optional;
 
 public interface DishRepository extends JpaRepository<Dish, Long> {
     Optional<Dish> findDishByShortId(String shortId);
+    Optional<Dish> findDishByName(String name);
 }

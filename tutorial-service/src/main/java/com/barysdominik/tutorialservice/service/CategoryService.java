@@ -27,14 +27,13 @@ public class CategoryService {
     }
 
     public void createCategory(CategoryDTO categoryDTO) {
-        Category category = categoryDTOToCategory.mapCategoryDTOToCategory(categoryDTO);
-        category.setShortId(UUID.randomUUID().toString().replace("-", "").substring(0, 12));
-
-        categoryRepository.findCategoryByName(category.getName()).ifPresent(value -> {
+        categoryRepository.findCategoryByName(categoryDTO.getName()).ifPresent(value -> {
                     throw new ObjectAlreadyExistInDatabaseException("Category with this name already exist");
                 }
         );
 
+        Category category = categoryDTOToCategory.mapCategoryDTOToCategory(categoryDTO);
+        category.setShortId(UUID.randomUUID().toString().replace("-", "").substring(0, 12));
         categoryRepository.save(category);
     }
 
