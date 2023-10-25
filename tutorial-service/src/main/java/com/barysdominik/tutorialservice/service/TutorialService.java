@@ -1,10 +1,10 @@
 package com.barysdominik.tutorialservice.service;
 
+import com.barysdominik.tutorialservice.entity.ingredient.Ingredient;
+import com.barysdominik.tutorialservice.entity.ingredient.IngredientDTO;
 import com.barysdominik.tutorialservice.entity.tutorial.Tutorial;
-import com.barysdominik.tutorialservice.repository.CategoryRepository;
-import com.barysdominik.tutorialservice.repository.DishRepository;
-import com.barysdominik.tutorialservice.repository.TutorialRepository;
-import com.barysdominik.tutorialservice.repository.UserRepository;
+import com.barysdominik.tutorialservice.exception.ObjectDoesNotExistInDatabaseException;
+import com.barysdominik.tutorialservice.repository.*;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.criteria.*;
@@ -32,6 +32,7 @@ public class TutorialService {
     private final TutorialRepository tutorialRepository;
     private final DishRepository dishRepository;
     private final CategoryRepository categoryRepository;
+    private final IngredientRepository ingredientRepository;
     private final UserRepository userRepository;
     @Value("${external.url.file-service}")
     private String FILE_SERVICE_EXTERNAL_URL;
@@ -51,10 +52,10 @@ public class TutorialService {
             String dishShortId,
             String categoryShortId,
             String authorUuid,
-            boolean hasMeat,
-            boolean isVeganRecipe,
-            boolean isSweetRecipe,
-            boolean isSpicyRecipe
+            Boolean hasMeat,
+            Boolean isVeganRecipe,
+            Boolean isSweetRecipe,
+            Boolean isSpicyRecipe
     ) {
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
         CriteriaQuery<Long> query = criteriaBuilder.createQuery(Long.class);
@@ -76,8 +77,8 @@ public class TutorialService {
     }
 
     public List<Tutorial> getTutorial(
-            int page,
-            int limit,
+            Integer page,
+            Integer limit,
             String sort,
             String order,
             String shortId,
@@ -85,10 +86,10 @@ public class TutorialService {
             String dishShortId,
             String categoryShortId,
             String authorUuid,
-            boolean hasMeat,
-            boolean isVeganRecipe,
-            boolean isSweetRecipe,
-            boolean isSpicyRecipe
+            Boolean hasMeat,
+            Boolean isVeganRecipe,
+            Boolean isSweetRecipe,
+            Boolean isSpicyRecipe
     ) {
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
         CriteriaQuery<Tutorial> query = criteriaBuilder.createQuery(Tutorial.class);
@@ -139,10 +140,10 @@ public class TutorialService {
             String dishShortId,
             String categoryShortId,
             String authorUuid,
-            boolean hasMeat,
-            boolean isVeganRecipe,
-            boolean isSweetRecipe,
-            boolean isSpicyRecipe,
+            Boolean hasMeat,
+            Boolean isVeganRecipe,
+            Boolean isSweetRecipe,
+            Boolean isSpicyRecipe,
             CriteriaBuilder criteriaBuilder,
             Root<Tutorial> root
     ) {
@@ -170,19 +171,19 @@ public class TutorialService {
             );
         }
 
-        if (hasMeat) {
+        if (hasMeat != null && hasMeat) {
             predicates.add(criteriaBuilder.isTrue(root.get("hasMeat")));
         }
 
-        if (isVeganRecipe) {
+        if (isVeganRecipe != null && isVeganRecipe) {
             predicates.add(criteriaBuilder.isTrue(root.get("isVeganRecipe")));
         }
 
-        if (isSweetRecipe) {
+        if (isSweetRecipe != null && isSweetRecipe) {
             predicates.add(criteriaBuilder.isTrue(root.get("isSweetRecipe")));
         }
 
-        if (isSpicyRecipe) {
+        if (isSweetRecipe != null && isSpicyRecipe) {
             predicates.add(criteriaBuilder.isTrue(root.get("isSpicyRecipe")));
         }
 
@@ -200,12 +201,28 @@ public class TutorialService {
         }
     }
 
+    public void addMainIngredientsToTutorial(List<IngredientDTO> ingredientDTOS, String tutorialShortId)
+            throws ObjectDoesNotExistInDatabaseException {
+        Tutorial tutorial = tutorialRepository.findTutorialByShortId(tutorialShortId).orElseThrow(
+                ObjectDoesNotExistInDatabaseException::new
+        );
+        List<Ingredient> ingredients = new ArrayList<>();
+        Ingredient ingredient = null;
+        for(IngredientDTO ingredientDTO : ingredientDTOS) {
+            ingredient = ingredientRepository.findIngredientByShortId(ingredientDTO.getShortId()).orElse(null);
+            if(ingredient != null) {
+                ingredients.add(ingredient);
+            }
+        }
+        tutorial.setMainIngredients(ingredients);
+        tutorialRepository.save(tutorial);
+    }
+
     public void activateImage(String shortId) {
         HttpRequest httpRequest = HttpRequest.newBuilder()
                 .uri(URI.create(FILE_SERVICE_EXTERNAL_URL + "?shortId=" + shortId))
                 .method("PATCH", HttpRequest.BodyPublishers.noBody())
                 .build();
-
         try {
             HttpClient.newHttpClient().send(httpRequest, HttpResponse.BodyHandlers.ofString());
         } catch (IOException | InterruptedException e) {

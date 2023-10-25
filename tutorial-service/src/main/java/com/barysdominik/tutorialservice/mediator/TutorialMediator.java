@@ -1,10 +1,12 @@
 package com.barysdominik.tutorialservice.mediator;
 
 import com.barysdominik.tutorialservice.entity.http.Response;
+import com.barysdominik.tutorialservice.entity.ingredient.IngredientDTO;
 import com.barysdominik.tutorialservice.entity.tutorial.SimpleTutorialDTO;
 import com.barysdominik.tutorialservice.entity.tutorial.Tutorial;
 import com.barysdominik.tutorialservice.entity.tutorial.TutorialDTO;
 import com.barysdominik.tutorialservice.entity.tutorial.TutorialFormDTO;
+import com.barysdominik.tutorialservice.exception.ObjectDoesNotExistInDatabaseException;
 import com.barysdominik.tutorialservice.mapper.tutorial.TutorialFormDTOToTutorial;
 import com.barysdominik.tutorialservice.mapper.tutorial.TutorialToSimpleTutorialDTO;
 import com.barysdominik.tutorialservice.mapper.tutorial.TutorialToTutorialDTO;
@@ -34,8 +36,8 @@ public class TutorialMediator {
     private String FILE_SERVICE_EXTERNAL_URL;
 
     public ResponseEntity<?> getTutorial(
-            int page,
-            int limit,
+            Integer page,
+            Integer limit,
             String sort,
             String order,
             String shortId,
@@ -43,10 +45,10 @@ public class TutorialMediator {
             String dishShortId,
             String categoryShortId,
             String authorUuid,
-            boolean hasMeat,
-            boolean isVeganRecipe,
-            boolean isSweetRecipe,
-            boolean isSpicyRecipe
+            Boolean hasMeat,
+            Boolean isVeganRecipe,
+            Boolean isSweetRecipe,
+            Boolean isSpicyRecipe
             ){
         if(name != null && name.trim().isEmpty()) {
             try {
@@ -116,6 +118,20 @@ public class TutorialMediator {
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(new Response("This type of category does not exist in database"));
+        }
+    }
+
+    public ResponseEntity<Response> addMainIngredientsToTutorial(
+            List<IngredientDTO> ingredientDTOS,
+            String tutorialShortId
+    ) {
+        try {
+            tutorialService.addMainIngredientsToTutorial(ingredientDTOS, tutorialShortId);
+            return ResponseEntity.ok(new Response("Main ingredients were added to tutorial successfully"));
+        } catch (ObjectDoesNotExistInDatabaseException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                    new Response("Problem has occurred while adding main ingredients to tutorial")
+            );
         }
     }
 

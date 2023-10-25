@@ -19,14 +19,17 @@ public class TutorialServiceEndpoints {
 
     private final List<Endpoint> endpointList = new ArrayList<>(List.of(
             new Endpoint("/api/v1/tutorial", HttpMethod.GET, Role.GUEST),
-            new Endpoint("/api/v1/tutorial", HttpMethod.POST, Role.ADMIN),
-            new Endpoint("/api/v1/tutorial", HttpMethod.DELETE, Role.ADMIN),
+            new Endpoint("/api/v1/tutorial", HttpMethod.POST, Role.GUEST),
+            new Endpoint("/api/v1/tutorial", HttpMethod.DELETE, Role.GUEST),
+            new Endpoint("/api/v1/tutorial", HttpMethod.PATCH, Role.GUEST),
             new Endpoint("/api/v1/category", HttpMethod.GET, Role.GUEST),
             new Endpoint("/api/v1/category/all", HttpMethod.GET, Role.GUEST),
             new Endpoint("/api/v1/category", HttpMethod.POST, Role.ADMIN),
             new Endpoint("/api/v1/dish/all", HttpMethod.GET, Role.GUEST),
             new Endpoint("/api/v1/dish", HttpMethod.GET, Role.GUEST),
-            new Endpoint("/api/v1/dish", HttpMethod.POST, Role.ADMIN)
+            new Endpoint("/api/v1/ingredient/all", HttpMethod.GET, Role.GUEST),
+            new Endpoint("/api/v1/ingredient", HttpMethod.GET, Role.GUEST),
+            new Endpoint("/api/v1/ingredient", HttpMethod.POST, Role.ADMIN)
     ));
 
 
