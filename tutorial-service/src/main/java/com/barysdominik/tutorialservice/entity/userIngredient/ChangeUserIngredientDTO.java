@@ -1,6 +1,5 @@
 package com.barysdominik.tutorialservice.entity.userIngredient;
 
-import com.barysdominik.tutorialservice.entity.ingredient.IngredientDTO;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -12,10 +11,8 @@ import java.time.LocalDate;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserIngredientDTO {
+public class ChangeUserIngredientDTO {
     private String shortId;
-    private IngredientDTO ingredientDTO;
     private LocalDate expirationDate;
-    private int quantity;
-    private String userUuid;
+    private Integer quantity;
 }

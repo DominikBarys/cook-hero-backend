@@ -10,6 +10,8 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 @EnableDiscoveryClient
 public class TutorialServiceApplication {
 
+    //TODO dodac tez delete, np page tego nie ma itp
+
     public static void main(String[] args) {
         SpringApplication.run(TutorialServiceApplication.class, args);
     }

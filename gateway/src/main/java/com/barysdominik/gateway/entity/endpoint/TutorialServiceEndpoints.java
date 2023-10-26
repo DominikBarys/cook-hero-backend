@@ -43,7 +43,11 @@ public class TutorialServiceEndpoints {
             new Endpoint("/api/v1/ingredient", HttpMethod.POST, Role.ADMIN),
             new Endpoint("/api/v1/page", HttpMethod.GET, Role.GUEST),
             new Endpoint("/api/v1/page", HttpMethod.POST, Role.GUEST),
-            new Endpoint("/api/v1/page", HttpMethod.PATCH, Role.GUEST)
+            new Endpoint("/api/v1/page", HttpMethod.PATCH, Role.GUEST),
+            new Endpoint("/api/v1/user-ingredient", HttpMethod.GET, Role.GUEST),
+            new Endpoint("/api/v1/user-ingredient", HttpMethod.POST, Role.GUEST),
+            new Endpoint("/api/v1/user-ingredient", HttpMethod.PATCH, Role.GUEST),
+            new Endpoint("/api/v1/user-ingredient", HttpMethod.DELETE, Role.GUEST)
     ));
 
 

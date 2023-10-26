@@ -21,10 +21,10 @@ public class UserIngredient {
     @GeneratedValue(generator = "user_ingredients_id_seq", strategy = GenerationType.SEQUENCE)
     @SequenceGenerator(name = "user_ingredients_id_seq", sequenceName = "user_ingredients_id_seq", allocationSize = 1)
     private long id;
-    private String uuid;
+    private String shortId;
     @ManyToOne
     @JoinColumn(name = "ingredientId", referencedColumnName = "id")
-    private Ingredient ingredientId;
+    private Ingredient ingredient;
     private LocalDate expirationDate;
     @Column(nullable = false)
     private int quantity;

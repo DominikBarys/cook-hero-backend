@@ -20,6 +20,7 @@ import java.util.List;
 @AllArgsConstructor
 @Table(name = "tutorial")
 public class Tutorial {
+    //TODO przy tworzeniu poradnika trzeba zwiekszac userowi ilosc stworzonych poradnikow
     @Id
     @GeneratedValue(generator = "tutorial_id_seq", strategy = GenerationType.SEQUENCE)
     @SequenceGenerator(name = "tutorial_id_seq", sequenceName = "tutorial_id_seq", allocationSize = 1)
