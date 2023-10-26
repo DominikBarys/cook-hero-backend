@@ -2,8 +2,8 @@ package com.barysdominik.tutorialservice.facade;
 
 import com.barysdominik.tutorialservice.entity.http.Response;
 import com.barysdominik.tutorialservice.entity.ingredient.IngredientDTO;
+import com.barysdominik.tutorialservice.entity.tutorial.SpecialParametersDTO;
 import com.barysdominik.tutorialservice.entity.tutorial.TutorialFormDTO;
-import com.barysdominik.tutorialservice.exception.ObjectDoesNotExistInDatabaseException;
 import com.barysdominik.tutorialservice.mediator.TutorialMediator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -56,12 +56,92 @@ public class TutorialController {
         return tutorialMediator.saveTutorial(tutorialDTO);
     }
 
+    @PatchMapping("change-thumbnail")
+    public ResponseEntity<Response> changeTutorialThumbnail(
+            @RequestParam String shortId,
+            @RequestParam int newThumbnailPosition
+    ) {
+        return tutorialMediator.changeTutorialThumbnail(shortId, newThumbnailPosition);
+    }
+
+    @PatchMapping("change-images")
+    public ResponseEntity<Response> changeTutorialCarouselImages(
+            @RequestParam String shortId,
+            @RequestParam String[] newImages
+    ) {
+        return tutorialMediator.changeTutorialCarouselImages(shortId, newImages);
+    }
+
+    @PatchMapping("change-name")
+    public ResponseEntity<Response> changeTutorialName(
+            @RequestParam String shortId,
+            @RequestParam String name
+    ) {
+        return tutorialMediator.changeTutorialName(shortId, name);
+    }
+
+    @PatchMapping("change-category")
+    public ResponseEntity<Response> changeTutorialCategory(
+            @RequestParam String shortId,
+            @RequestParam String categoryShortId
+    ) {
+        return tutorialMediator.changeTutorialCategory(shortId, categoryShortId);
+    }
+
+    @PatchMapping("change-dish")
+    public ResponseEntity<Response> changeTutorialDish(
+            @RequestParam String shortId,
+            @RequestParam String dishShortId
+    ) {
+        return tutorialMediator.changeTutorialDish(shortId, dishShortId);
+    }
+
     @PatchMapping("/add-ingredients")
     public ResponseEntity<Response> addMainIngredientsToTutorial(
             @RequestBody List<IngredientDTO> ingredientDTOList,
             @RequestParam String tutorialShortId
     ) {
             return tutorialMediator.addMainIngredientsToTutorial(ingredientDTOList, tutorialShortId);
+    }
+
+    @PatchMapping("change-parameters")
+    public ResponseEntity<Response> changeTutorialParameters(
+            @RequestParam String shortId,
+            @RequestParam String newParameters
+    ) {
+        return tutorialMediator.changeTutorialParameters(shortId, newParameters);
+    }
+
+    @PatchMapping("change-time-to-prepare")
+    public ResponseEntity<Response> changeTimeToPrepare(
+            @RequestParam String shortId,
+            @RequestParam int newTimeToPrepare
+    ) {
+        return tutorialMediator.changeTutorialTimeToPrepare(shortId, newTimeToPrepare);
+    }
+
+    @PatchMapping("change-difficulty")
+    public ResponseEntity<Response> changeDifficulty(
+            @RequestParam String shortId,
+            @RequestParam int newDifficulty
+    ) {
+        return tutorialMediator.changeTutorialDifficulty(shortId, newDifficulty);
+    }
+
+    @PatchMapping("change-short-description")
+    public ResponseEntity<Response> changeShortDescription(
+            @RequestParam String shortId,
+            @RequestParam String newShortDescription
+    ) {
+        return tutorialMediator.changeTutorialShortDescription(shortId, newShortDescription);
+    }
+
+    @PatchMapping("change-special-parameters")
+    public ResponseEntity<Response> changeSpecialParameters(
+            @RequestParam String shortId,
+            @RequestBody SpecialParametersDTO specialParametersDTO
+    ) {
+        return tutorialMediator.changeTutorialSpecialParameters(shortId, specialParametersDTO);
     }
 
     @DeleteMapping

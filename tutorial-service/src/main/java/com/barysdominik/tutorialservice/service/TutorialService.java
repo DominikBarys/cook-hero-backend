@@ -1,7 +1,10 @@
 package com.barysdominik.tutorialservice.service;
 
+import com.barysdominik.tutorialservice.entity.category.Category;
+import com.barysdominik.tutorialservice.entity.dish.Dish;
 import com.barysdominik.tutorialservice.entity.ingredient.Ingredient;
 import com.barysdominik.tutorialservice.entity.ingredient.IngredientDTO;
+import com.barysdominik.tutorialservice.entity.tutorial.SpecialParametersDTO;
 import com.barysdominik.tutorialservice.entity.tutorial.Tutorial;
 import com.barysdominik.tutorialservice.exception.ObjectDoesNotExistInDatabaseException;
 import com.barysdominik.tutorialservice.repository.*;
@@ -196,9 +199,90 @@ public class TutorialService {
         tutorial.setShortId(UUID.randomUUID().toString().replace("-", "").substring(0, 12));
         tutorialRepository.save(tutorial);
 
-        for (String shortId : tutorial.getImageUrls()) {
-            activateImage(shortId);
+        for (String imageUrl : tutorial.getImageUrls()) {
+            activateImage(imageUrl);
         }
+    }
+
+    public void changeTutorialThumbnail(String shortId, int newThumbnailPosition)
+            throws ObjectDoesNotExistInDatabaseException {
+        Tutorial tutorial = tutorialRepository.findTutorialByShortId(shortId).orElse(null);
+        if (tutorial != null) {
+            if (newThumbnailPosition >= tutorial.getImageUrls().length) {
+                throw new ObjectDoesNotExistInDatabaseException("Wrong image position was given");
+            }
+            String[] imageUrls = tutorial.getImageUrls();
+            String tmp = imageUrls[0];
+            imageUrls[0] = imageUrls[newThumbnailPosition];
+            imageUrls[newThumbnailPosition] = tmp;
+            tutorial.setImageUrls(imageUrls);
+            tutorialRepository.save(tutorial);
+            return;
+        }
+        throw new ObjectDoesNotExistInDatabaseException(
+                "Tutorial with shortId: '" + shortId + "' does not exist in database"
+        );
+    }
+
+    //TODO can not work
+    public void changeTutorialCarouselImages(String shortId, String[] newImages) {
+        Tutorial tutorial = tutorialRepository.findTutorialByShortId(shortId).orElse(null);
+        if (tutorial != null) {
+            tutorial.setImageUrls(newImages);
+            tutorialRepository.save(tutorial);
+            return;
+        }
+        throw new ObjectDoesNotExistInDatabaseException(
+                "Tutorial with shortId: '" + shortId + "' does not exist in database"
+        );
+    }
+
+    public void changeTutorialName(String shortId, String name) {
+        Tutorial tutorial = tutorialRepository.findTutorialByShortId(shortId).orElse(null);
+        if (tutorial != null) {
+            tutorial.setName(name);
+            tutorialRepository.save(tutorial);
+            return;
+        }
+        throw new ObjectDoesNotExistInDatabaseException(
+                "Tutorial with shortId: '" + shortId + "' does not exist in database"
+        );
+    }
+
+    public void changeTutorialCategory(String shortId, String categoryShortId) {
+        Category category = categoryRepository.findCategoryByShortId(categoryShortId).orElse(null);
+        if (category == null) {
+            throw new ObjectDoesNotExistInDatabaseException(
+                    "Category with shortId: '" + shortId + "' does not exist in database"
+            );
+        }
+        Tutorial tutorial = tutorialRepository.findTutorialByShortId(shortId).orElse(null);
+        if (tutorial != null) {
+            tutorial.setCategory(category);
+            tutorialRepository.save(tutorial);
+            return;
+        }
+        throw new ObjectDoesNotExistInDatabaseException(
+                "Tutorial with shortId: '" + shortId + "' does not exist in database"
+        );
+    }
+
+    public void changeTutorialDish(String shortId, String dishShortId) {
+        Dish dish = dishRepository.findDishByShortId(dishShortId).orElse(null);
+        if (dish == null) {
+            throw new ObjectDoesNotExistInDatabaseException(
+                    "Dish with shortId: '" + shortId + "' does not exist in database"
+            );
+        }
+        Tutorial tutorial = tutorialRepository.findTutorialByShortId(shortId).orElse(null);
+        if (tutorial != null) {
+            tutorial.setDish(dish);
+            tutorialRepository.save(tutorial);
+            return;
+        }
+        throw new ObjectDoesNotExistInDatabaseException(
+                "Tutorial with shortId: '" + shortId + "' does not exist in database"
+        );
     }
 
     public void addMainIngredientsToTutorial(List<IngredientDTO> ingredientDTOS, String tutorialShortId)
@@ -208,14 +292,88 @@ public class TutorialService {
         );
         List<Ingredient> ingredients = new ArrayList<>();
         Ingredient ingredient = null;
-        for(IngredientDTO ingredientDTO : ingredientDTOS) {
+        for (IngredientDTO ingredientDTO : ingredientDTOS) {
             ingredient = ingredientRepository.findIngredientByShortId(ingredientDTO.getShortId()).orElse(null);
-            if(ingredient != null) {
+            if (ingredient != null) {
                 ingredients.add(ingredient);
             }
         }
         tutorial.setMainIngredients(ingredients);
         tutorialRepository.save(tutorial);
+    }
+
+    //TODO maybe GSON in future here
+    public void changeTutorialParameters(String shortId, String newParameters) {
+        Tutorial tutorial = tutorialRepository.findTutorialByShortId(shortId).orElse(null);
+        if (tutorial != null) {
+            tutorial.setParameters(newParameters);
+            tutorialRepository.save(tutorial);
+            return;
+        }
+        throw new ObjectDoesNotExistInDatabaseException(
+                "Tutorial with shortId: '" + shortId + "' does not exist in database"
+        );
+    }
+
+    public void changeTimeToPrepare(String shortId, int newTimeToPrepare) {
+        Tutorial tutorial = tutorialRepository.findTutorialByShortId(shortId).orElse(null);
+        if (tutorial != null) {
+            tutorial.setTimeToPrepare(newTimeToPrepare);
+            tutorialRepository.save(tutorial);
+            return;
+        }
+        throw new ObjectDoesNotExistInDatabaseException(
+                "Tutorial with shortId: '" + shortId + "' does not exist in database"
+        );
+    }
+
+    public void changeTutorialDifficulty(String shortId, int newDifficulty) {
+        Tutorial tutorial = tutorialRepository.findTutorialByShortId(shortId).orElse(null);
+        if (tutorial != null) {
+            tutorial.setDifficulty(newDifficulty);
+            tutorialRepository.save(tutorial);
+            return;
+        }
+        throw new ObjectDoesNotExistInDatabaseException(
+                "Tutorial with shortId: '" + shortId + "' does not exist in database"
+        );
+    }
+
+    //TODO use it
+    public void changeShortDescription(String shortId, String newShortDescription) {
+        Tutorial tutorial = tutorialRepository.findTutorialByShortId(shortId).orElse(null);
+        if (tutorial != null) {
+            tutorial.setShortDescription(newShortDescription);
+            tutorialRepository.save(tutorial);
+            return;
+        }
+        throw new ObjectDoesNotExistInDatabaseException(
+                "Tutorial with shortId: '" + shortId + "' does not exist in database"
+        );
+    }
+
+    //TODO use it
+    public void changeSpecialParameters(String shortId, SpecialParametersDTO specialParametersDTO) {
+        Tutorial tutorial = tutorialRepository.findTutorialByShortId(shortId).orElse(null);
+        if (tutorial != null) {
+            if (specialParametersDTO.getHasMeat() != null) {
+                tutorial.setHasMeat(specialParametersDTO.getHasMeat());
+            }
+            if (specialParametersDTO.getIsVeganRecipe() != null) {
+                tutorial.setVeganRecipe(specialParametersDTO.getIsVeganRecipe());
+            }
+            if (specialParametersDTO.getIsSpicyRecipe() != null) {
+                tutorial.setSpicyRecipe(specialParametersDTO.getIsSpicyRecipe());
+            }
+            if (specialParametersDTO.getIsSweetRecipe() != null) {
+                tutorial.setSweetRecipe(specialParametersDTO.getIsSweetRecipe());
+            }
+            tutorialRepository.save(tutorial);
+            return;
+        }
+        throw new ObjectDoesNotExistInDatabaseException(
+                "Tutorial with shortId: '" + shortId + "' does not exist in database"
+        );
     }
 
     public void activateImage(String shortId) {
@@ -233,9 +391,15 @@ public class TutorialService {
     public void delete(String shortId) {
         tutorialRepository.findTutorialByShortId(shortId).ifPresentOrElse(
                 value -> {
-                    tutorialRepository.save(value);
-                    for(String imageUrl : value.getImageUrls()) {
-                        deleteImage(imageUrl);
+                    tutorialRepository.delete(value);
+                    for (String imageUrl : value.getImageUrls()) {
+                        try {
+                            //deleteImage(imageUrl); //TODO commented for testing purposes
+                        } catch (Exception ex) {
+                            throw new RuntimeException(
+                                    "Tutorial was deleted but there occurred a problem with deleting files"
+                            );
+                        }
                     }
                 },
                 () -> {

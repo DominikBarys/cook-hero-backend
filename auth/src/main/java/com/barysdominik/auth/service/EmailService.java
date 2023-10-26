@@ -33,6 +33,10 @@ public class EmailService {
                     "FRONTEND_URL",
                     frontendUrl + "/aktywuj/" + user.getUuid()
             );
+            htmlMailContent = htmlMailContent.replace(
+                    "USERNAME_HERE",
+                    user.getUsername()
+            );
             emailConfiguration.sendMail(user.getEmail(), htmlMailContent, "Aktywuj konto", true);
             log.info("Account activation mail was successfully sent to email address: '" + user.getEmail() + "'");
         } catch (IOException e) {
@@ -47,6 +51,10 @@ public class EmailService {
             htmlMailContent = htmlMailContent.replace(
                     "FRONTEND_URL",
                     frontendUrl + "/odzyskaj-haslo/" + uuid
+            );
+            htmlMailContent = htmlMailContent.replace(
+                    "USERNAME_HERE",
+                    user.getUsername()
             );
             emailConfiguration.sendMail(user.getEmail(), htmlMailContent,"Odzyskaj hasło",true);
             log.info("Reset password mail was successfully sent to email address: '" + user.getEmail() + "'");

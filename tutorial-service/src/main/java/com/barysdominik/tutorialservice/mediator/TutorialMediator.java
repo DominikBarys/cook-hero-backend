@@ -2,10 +2,7 @@ package com.barysdominik.tutorialservice.mediator;
 
 import com.barysdominik.tutorialservice.entity.http.Response;
 import com.barysdominik.tutorialservice.entity.ingredient.IngredientDTO;
-import com.barysdominik.tutorialservice.entity.tutorial.SimpleTutorialDTO;
-import com.barysdominik.tutorialservice.entity.tutorial.Tutorial;
-import com.barysdominik.tutorialservice.entity.tutorial.TutorialDTO;
-import com.barysdominik.tutorialservice.entity.tutorial.TutorialFormDTO;
+import com.barysdominik.tutorialservice.entity.tutorial.*;
 import com.barysdominik.tutorialservice.exception.ObjectDoesNotExistInDatabaseException;
 import com.barysdominik.tutorialservice.mapper.tutorial.TutorialFormDTOToTutorial;
 import com.barysdominik.tutorialservice.mapper.tutorial.TutorialToSimpleTutorialDTO;
@@ -49,8 +46,8 @@ public class TutorialMediator {
             Boolean isVeganRecipe,
             Boolean isSweetRecipe,
             Boolean isSpicyRecipe
-            ){
-        if(name != null && name.trim().isEmpty()) {
+    ) {
+        if (name != null && name.trim().isEmpty()) {
             try {
                 name = URLDecoder.decode(name, "UTF-8");
             } catch (UnsupportedEncodingException e) {
@@ -75,12 +72,12 @@ public class TutorialMediator {
         );
 
         tutorials.forEach(value -> {
-            for(int i = 0; i < value.getImageUrls().length; i++) {
-                value.getImageUrls()[i] = FILE_SERVICE_EXTERNAL_URL + "?shortId" + value.getImageUrls()[i];
+            for (int i = 0; i < value.getImageUrls().length; i++) {
+                value.getImageUrls()[i] = FILE_SERVICE_EXTERNAL_URL + "?shortId=" + value.getImageUrls()[i];
             }
         });
 
-        if(shortId == null || shortId.trim().isEmpty()) {
+        if (shortId == null || shortId.trim().isEmpty()) {
             List<SimpleTutorialDTO> simpleTutorialDTOS = new ArrayList<>();
             long totalCount = tutorialService.countSearchedResults(
                     name,
@@ -107,17 +104,61 @@ public class TutorialMediator {
     public ResponseEntity<Response> saveTutorial(TutorialFormDTO tutorialFormDTO) {
         try {
             Tutorial tutorial = tutorialFormDTOToTutorial.mapTutorialFormDTOToTutorial(tutorialFormDTO);
-//            categoryService.getCategory(tutorial.getCategory().getShortId()).ifPresentOrElse(
-//                    tutorial::setCategory,
-//                    () -> {
-//                        throw new ObjectDoesNotExistInDatabaseException("This type of category does not exist in database");
-//                    }
-//            );
             tutorialService.createTutorial(tutorial);
             return ResponseEntity.ok(new Response("Tutorial created successfully"));
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(new Response("This type of category does not exist in database"));
+        }
+    }
+
+    public ResponseEntity<Response> changeTutorialThumbnail(String shortId, int newThumbnailPosition) {
+        try {
+            tutorialService.changeTutorialThumbnail(shortId, newThumbnailPosition);
+            return ResponseEntity.ok(new Response("Thumbnail changed successfully"));
+        } catch (ObjectDoesNotExistInDatabaseException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new Response("Something went wrong while changing thumbnail"));
+        }
+    }
+
+    public ResponseEntity<Response> changeTutorialCarouselImages(String shortId, String[] newImages) {
+        try {
+            tutorialService.changeTutorialCarouselImages(shortId, newImages);
+            return ResponseEntity.ok(new Response("Images in carousel changed successfully"));
+        } catch (ObjectDoesNotExistInDatabaseException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new Response("Something went wrong while changing images"));
+        }
+    }
+
+    public ResponseEntity<Response> changeTutorialName(String shortId, String name) {
+        try {
+            tutorialService.changeTutorialName(shortId, name);
+            return ResponseEntity.ok(new Response("Name changed successfully"));
+        } catch (ObjectDoesNotExistInDatabaseException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new Response("Something went wrong while changing name"));
+        }
+    }
+
+    public ResponseEntity<Response> changeTutorialCategory(String shortId, String categoryShortId) {
+        try {
+            tutorialService.changeTutorialCategory(shortId, categoryShortId);
+            return ResponseEntity.ok(new Response("Category changed successfully"));
+        } catch (ObjectDoesNotExistInDatabaseException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new Response("Something went wrong while changing category"));
+        }
+    }
+
+    public ResponseEntity<Response> changeTutorialDish(String shortId, String dishShortId) {
+        try {
+            tutorialService.changeTutorialDish(shortId, dishShortId);
+            return ResponseEntity.ok(new Response("Dish changed successfully"));
+        } catch (ObjectDoesNotExistInDatabaseException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new Response("Something went wrong while changing dish"));
         }
     }
 
@@ -132,6 +173,59 @@ public class TutorialMediator {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
                     new Response("Problem has occurred while adding main ingredients to tutorial")
             );
+        }
+    }
+
+    public ResponseEntity<Response> changeTutorialParameters(String shortId, String newParameters) {
+        try {
+            tutorialService.changeTutorialParameters(shortId, newParameters);
+            return ResponseEntity.ok(new Response("Parameters changed successfully"));
+        } catch (ObjectDoesNotExistInDatabaseException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new Response("Something went wrong while changing parameters"));
+        }
+    }
+
+    public ResponseEntity<Response> changeTutorialTimeToPrepare(String shortId, int newTimeToPrepare) {
+        try {
+            tutorialService.changeTimeToPrepare(shortId, newTimeToPrepare);
+            return ResponseEntity.ok(new Response("Time to prepare changed successfully"));
+        } catch (ObjectDoesNotExistInDatabaseException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new Response("Something went wrong while changing time to prepare"));
+        }
+    }
+
+    public ResponseEntity<Response> changeTutorialDifficulty(String shortId, int newDifficulty) {
+        try {
+            tutorialService.changeTutorialDifficulty(shortId, newDifficulty);
+            return ResponseEntity.ok(new Response("Difficulty changed successfully"));
+        } catch (ObjectDoesNotExistInDatabaseException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new Response("Something went wrong while changing difficulty"));
+        }
+    }
+
+    public ResponseEntity<Response> changeTutorialShortDescription(String shortId, String newShortDescription) {
+        try {
+            tutorialService.changeShortDescription(shortId, newShortDescription);
+            return ResponseEntity.ok(new Response("Short description changed successfully"));
+        } catch (ObjectDoesNotExistInDatabaseException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new Response("Something went wrong while changing short description"));
+        }
+    }
+
+    public ResponseEntity<Response> changeTutorialSpecialParameters(
+            String shortId,
+            SpecialParametersDTO specialParametersDTO
+    ) {
+        try {
+            tutorialService.changeSpecialParameters(shortId, specialParametersDTO);
+            return ResponseEntity.ok(new Response("Special parameters description changed successfully"));
+        } catch (ObjectDoesNotExistInDatabaseException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new Response("Something went wrong while changing special parameters"));
         }
     }
 
