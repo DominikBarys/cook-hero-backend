@@ -1,6 +1,10 @@
 package com.barysdominik.tutorialservice.entity.tutorial;
 
 import com.barysdominik.tutorialservice.entity.category.CategoryDTO;
+import com.barysdominik.tutorialservice.entity.dish.DishDTO;
+import com.barysdominik.tutorialservice.entity.ingredient.IngredientDTO;
+import com.barysdominik.tutorialservice.entity.user.User;
+import com.barysdominik.tutorialservice.entity.user.UserDTO;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -22,8 +26,8 @@ public class TutorialDTO {
     private String[] imageUrls;
     private String shortDescription;
     private String parameters;
-    private long dishId;
-    private List<Long> mainIngredientsIds;
+    private DishDTO dishDTO;
+    private List<IngredientDTO> mainIngredientsDTOS;
     private CategoryDTO categoryDTO;
-    private long authorId;
+    private UserDTO authorDTO;
 }
