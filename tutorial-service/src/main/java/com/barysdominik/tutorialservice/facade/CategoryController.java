@@ -46,4 +46,10 @@ public class CategoryController {
         }
         return ResponseEntity.ok(new Response("Operation ended with success"));
     }
+
+    @DeleteMapping
+    public ResponseEntity<Response> deleteCategory(String shortId){
+        return categoryMediator.deleteCategory(shortId);
+    }
+
 }

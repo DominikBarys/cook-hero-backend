@@ -2,6 +2,7 @@ package com.barysdominik.tutorialservice.mediator;
 
 import com.barysdominik.tutorialservice.entity.category.Category;
 import com.barysdominik.tutorialservice.entity.category.CategoryDTO;
+import com.barysdominik.tutorialservice.entity.http.Response;
 import com.barysdominik.tutorialservice.exception.ObjectAlreadyExistInDatabaseException;
 import com.barysdominik.tutorialservice.exception.ObjectDoesNotExistInDatabaseException;
 import com.barysdominik.tutorialservice.mapper.category.CategoryToCategoryDTO;
@@ -44,6 +45,17 @@ public class CategoryMediator {
 
     public void createCategory(CategoryDTO categoryDTO) throws ObjectAlreadyExistInDatabaseException {
         categoryService.createCategory(categoryDTO);
+    }
+
+    public ResponseEntity<Response> deleteCategory(String shortId) {
+        try {
+            categoryService.deleteCategory(shortId);
+            return ResponseEntity.ok(new Response("Category with shortId: '" + shortId + "' deleted successfully"));
+        } catch (ObjectDoesNotExistInDatabaseException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                    new Response("Category with shortId: '" + shortId + "' does not exist in database")
+            );
+        }
     }
 
 }

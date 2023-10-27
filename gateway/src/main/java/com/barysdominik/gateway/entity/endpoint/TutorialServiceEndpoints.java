@@ -35,6 +35,7 @@ public class TutorialServiceEndpoints {
             new Endpoint("/api/v1/category", HttpMethod.GET, Role.GUEST),
             new Endpoint("/api/v1/category/all", HttpMethod.GET, Role.GUEST),
             new Endpoint("/api/v1/category", HttpMethod.POST, Role.ADMIN),
+            new Endpoint("/api/v1/category", HttpMethod.DELETE, Role.ADMIN),
             new Endpoint("/api/v1/dish/all", HttpMethod.GET, Role.GUEST),
             new Endpoint("/api/v1/dish", HttpMethod.GET, Role.GUEST),
             new Endpoint("/api/v1/dish", HttpMethod.POST, Role.GUEST),
@@ -49,7 +50,6 @@ public class TutorialServiceEndpoints {
             new Endpoint("/api/v1/user-ingredient", HttpMethod.PATCH, Role.GUEST),
             new Endpoint("/api/v1/user-ingredient", HttpMethod.DELETE, Role.GUEST)
     ));
-
 
     @PostConstruct
     public void registerEndpoints(){
