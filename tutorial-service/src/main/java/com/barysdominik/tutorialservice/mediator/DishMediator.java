@@ -2,13 +2,16 @@ package com.barysdominik.tutorialservice.mediator;
 
 import com.barysdominik.tutorialservice.entity.dish.Dish;
 import com.barysdominik.tutorialservice.entity.dish.DishDTO;
+import com.barysdominik.tutorialservice.entity.http.Response;
 import com.barysdominik.tutorialservice.exception.ObjectAlreadyExistInDatabaseException;
 import com.barysdominik.tutorialservice.exception.ObjectDoesNotExistInDatabaseException;
 import com.barysdominik.tutorialservice.mapper.dish.DishToDishDTO;
 import com.barysdominik.tutorialservice.service.DishService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.DeleteMapping;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,4 +45,15 @@ public class DishMediator {
         dishService.createDish(dishDTO);
     }
 
+    public ResponseEntity<Response> deleteDish(String shortId) {
+        try {
+            dishService.deleteDish(shortId);
+            return ResponseEntity.ok(new Response("Dish with shortId: '" + shortId + "' deleted successfully"));
+        } catch (ObjectDoesNotExistInDatabaseException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                    new Response("Dish with shortId: '" + shortId + "' does not exist in database")
+            );
+        }
+    }
+    
 }

@@ -48,4 +48,9 @@ public class DishController {
         return ResponseEntity.ok(new Response("Operation ended with success"));
     }
 
+    @DeleteMapping
+    public ResponseEntity<Response> deleteDish(String shortId) {
+        return dishMediator.deleteDish(shortId);
+    }
+
 }
