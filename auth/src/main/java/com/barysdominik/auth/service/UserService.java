@@ -7,6 +7,7 @@ import com.barysdominik.auth.entity.user.*;
 import com.barysdominik.auth.exception.*;
 import com.barysdominik.auth.repository.UserRepository;
 import com.barysdominik.auth.repository.UserResetPasswordRepository;
+import com.barysdominik.auth.repository.dao.UserDeleteOperationsDAO;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -41,6 +42,7 @@ public class UserService {
     private final EmailService emailService;
     private final UserResetPasswordService userResetPasswordService;
     private final UserResetPasswordRepository userResetPasswordRepository;
+    private final UserDeleteOperationsDAO userDeleteOperationsDAO;
     @Value("${jwt.exp}")
     private int exp;
     @Value("${jwt.refresh}")
@@ -331,11 +333,17 @@ public class UserService {
             throw new CannotAuthorizeByTokenException("Tokens are null or expired");
         }
 
-        if(user != null) {
-            userResetPasswordRepository.deleteAllByUser(user);
-            userRepository.delete(user);
-            log.info("User with uuid: '" + uuid + "' deleted successfully");
+        User userToDelete = userRepository.findUserByUuid(uuid).orElse(null);
 
+        if(user != null) {
+            if(userToDelete != null) {
+                userDeleteOperationsDAO.deleteUserOperations(userToDelete.getId());
+                userResetPasswordRepository.deleteAllByUser(userToDelete);
+                userRepository.delete(userToDelete);
+                log.info("User with uuid: '" + uuid + "' deleted successfully");
+                return;
+            }
+            throw new UserDontExistException("Such user don't exist");
         }
     }
 

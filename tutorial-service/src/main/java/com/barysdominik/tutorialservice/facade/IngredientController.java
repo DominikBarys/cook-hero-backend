@@ -47,4 +47,9 @@ public class IngredientController {
         return ResponseEntity.ok(new Response("Operation ended with success"));
     }
 
+    @DeleteMapping
+    public ResponseEntity<Response> deleteIngredient(String shortId) {
+        return ingredientMediator.deleteIngredient(shortId);
+    }
+
 }

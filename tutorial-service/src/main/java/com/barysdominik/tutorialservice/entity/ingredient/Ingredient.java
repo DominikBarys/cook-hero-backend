@@ -2,16 +2,14 @@ package com.barysdominik.tutorialservice.entity.ingredient;
 
 import com.barysdominik.tutorialservice.entity.tutorial.Tutorial;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.List;
 
 @Entity
 @Getter
 @Setter
+@EqualsAndHashCode
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "ingredient")

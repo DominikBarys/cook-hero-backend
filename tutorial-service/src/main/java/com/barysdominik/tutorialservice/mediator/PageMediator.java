@@ -21,7 +21,7 @@ public class PageMediator {
     private final PageDTOToPage pageDTOToPage;
 
     public ResponseEntity<PageDTO> getPage(String tutorialShortId, int pageNumber)
-            throws ObjectDoesNotExistInDatabaseException{
+            throws ObjectDoesNotExistInDatabaseException {
         Page page = pageService.getPage(tutorialShortId, pageNumber);
         PageDTO pageDTO = pageToPageDTO.mapPageToPageDTO(page);
         long totalCount = pageService.countPages(tutorialShortId);
@@ -49,6 +49,17 @@ public class PageMediator {
         } catch (ObjectDoesNotExistInDatabaseException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(new Response("Something went wrong while changing html content"));
+        }
+    }
+
+    public ResponseEntity<Response> deletePage(String shortId) {
+        try {
+            pageService.deletePage(shortId);
+            return ResponseEntity.ok(new Response("Page with shortId: '" + shortId + "' deleted successfully"));
+        } catch (ObjectDoesNotExistInDatabaseException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                    new Response("Page with shortId: '" + shortId + "' does not exist in database")
+            );
         }
     }
 

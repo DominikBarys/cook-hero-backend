@@ -1,5 +1,6 @@
 package com.barysdominik.tutorialservice.mediator;
 
+import com.barysdominik.tutorialservice.entity.http.Response;
 import com.barysdominik.tutorialservice.entity.ingredient.Ingredient;
 import com.barysdominik.tutorialservice.entity.ingredient.IngredientDTO;
 import com.barysdominik.tutorialservice.exception.ObjectAlreadyExistInDatabaseException;
@@ -7,6 +8,7 @@ import com.barysdominik.tutorialservice.exception.ObjectDoesNotExistInDatabaseEx
 import com.barysdominik.tutorialservice.mapper.ingredient.IngredientToIngredientDTO;
 import com.barysdominik.tutorialservice.service.IngredientService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
@@ -39,5 +41,16 @@ public class IngredientMediator {
 
     public void createIngredient(IngredientDTO ingredientDTO) throws ObjectAlreadyExistInDatabaseException {
         ingredientService.createIngredient(ingredientDTO);
+    }
+
+    public ResponseEntity<Response> deleteIngredient(String shortId) {
+        try {
+            ingredientService.deleteIngredient(shortId);
+            return ResponseEntity.ok(new Response("Ingredient with shortId: '" + shortId + "' deleted successfully"));
+        } catch (ObjectDoesNotExistInDatabaseException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                    new Response("Ingredient with shortId: '" + shortId + "' does not exist in database")
+            );
+        }
     }
 }

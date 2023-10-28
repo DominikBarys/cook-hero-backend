@@ -38,4 +38,9 @@ public class PageController {
         return pageMediator.changePageHtmlContent(shortId, newHtmlContent);
     }
 
+    @DeleteMapping
+    public ResponseEntity<Response> deletePage(@RequestParam String shortId) {
+        return pageMediator.deletePage(shortId);
+    }
+
 }

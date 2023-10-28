@@ -19,6 +19,7 @@ import java.util.UUID;
 @Entity
 @AllArgsConstructor
 public class User implements UserDetails {
+    //TODO delete amount of reviews
     @Id
     @GeneratedValue(generator = "users_id_seq", strategy = GenerationType.SEQUENCE)
     @SequenceGenerator(name = "users_id_seq", sequenceName = "users_id_seq", allocationSize = 1)

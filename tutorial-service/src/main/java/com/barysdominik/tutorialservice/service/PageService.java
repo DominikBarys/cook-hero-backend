@@ -65,4 +65,15 @@ public class PageService {
         );
     }
 
+    public void deletePage(String shortId) throws ObjectDoesNotExistInDatabaseException {
+        Page page = pageRepository.findPageByShortId(shortId).orElse(null);
+        if (page != null) {
+            pageRepository.delete(page);
+            return;
+        }
+        throw new ObjectDoesNotExistInDatabaseException(
+                "Page with shortId: '" + shortId + "' does not exist in database"
+        );
+    }
+
 }
