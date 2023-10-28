@@ -26,7 +26,7 @@ public class NotificationService {
         throw new UserNotFoundException("User with uuid: '" + userUuid + "' does not exist in database");
     }
 
-    public Notification getNotification(String shortId) {
+    public Notification getNotification(String shortId) throws NotificationNotFoundException {
         Notification notification = notificationRepository.getNotificationByShortId(shortId).orElse(null);
         if (notification != null) {
             return notification;
@@ -34,7 +34,7 @@ public class NotificationService {
         throw new NotificationNotFoundException("Notification with uuid: '" + shortId + "' does not exist in database");
     }
 
-    public void deleteNotification(String shortId) {
+    public void deleteNotification(String shortId) throws NotificationNotFoundException {
         Notification notification = notificationRepository.getNotificationByShortId(shortId).orElse(null);
         if (notification != null) {
             notificationRepository.delete(notification);
@@ -43,7 +43,7 @@ public class NotificationService {
         throw new NotificationNotFoundException("Notification with uuid: '" + shortId + "' does not exist in database");
     }
 
-    public void deleteAllNotifications(String userUuid) {
+    public void deleteAllNotifications(String userUuid) throws NotificationNotFoundException {
         User user = userRepository.findUserByUuid(userUuid).orElse(null);
         List<Notification> notification = notificationRepository.findAllByReceiver(user);
         if (notification != null) {
