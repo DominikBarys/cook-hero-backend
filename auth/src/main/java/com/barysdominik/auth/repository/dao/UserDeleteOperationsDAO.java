@@ -1,5 +1,6 @@
 package com.barysdominik.auth.repository.dao;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.sql.Connection;
@@ -11,11 +12,17 @@ import java.sql.ResultSet;
 @Component
 public class UserDeleteOperationsDAO {
 
+    @Value("${spring.datasource.url}")
+    private String url;
+    @Value("${spring.datasource.username}")
+    private String user;
+    @Value("${spring.datasource.password}")
+    private String password;
 
     public void deleteUserOperations(long userId) {
         Connection connection = null;
         try {
-            connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/postgres", "postgres", "postgres");
+            connection = DriverManager.getConnection(url, user, password);
             PreparedStatement preparedStatement = null;
 
             String selectTutorialsSql = "SELECT id FROM tutorial WHERE author_id = ?";
