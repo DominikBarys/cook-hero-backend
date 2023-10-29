@@ -34,7 +34,6 @@ public class CategoryController {
         }
     }
 
-    //TODO poprawic rzucanie wyjatkow na podstawie na przyklad tego
     @PostMapping
     public ResponseEntity<?> createCategory(@RequestBody CategoryDTO categoryDTO) {
         try {
@@ -47,7 +46,6 @@ public class CategoryController {
         return ResponseEntity.ok(new Response("Operation ended with success"));
     }
 
-    //TODO ustawia nulla na poradnik
     @DeleteMapping
     public ResponseEntity<Response> deleteCategory(String shortId){
         return categoryMediator.deleteCategory(shortId);

@@ -220,7 +220,7 @@ public class UserService {
         try {
             jwtService.validateToken(token);
         } catch (ExpiredJwtException | IllegalArgumentException e) {
-            //TODO tutaj sie trafia zawsze, prowadzi tu gateway, wiec odswiezanie wystarczy tylko tu, ewentualnie jeszcze w authorize
+            //tutaj sie trafia zawsze, prowadzi tu gateway, wiec odswiezanie wystarczy tylko tu, ewentualnie jeszcze w authorize
             log.warn("Token has expired, trying to validate via refresh token");
             jwtService.validateToken(refresh);
 

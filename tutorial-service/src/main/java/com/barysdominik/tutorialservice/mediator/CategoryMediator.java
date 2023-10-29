@@ -32,7 +32,6 @@ public class CategoryMediator {
 
     }
 
-    //TODO tutaj jest dobrze
     public ResponseEntity<CategoryDTO> getCategory(String shortId) {
         Category category = categoryService.getCategory(shortId);
         if (category != null) {

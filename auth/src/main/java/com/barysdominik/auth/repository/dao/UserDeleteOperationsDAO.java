@@ -27,18 +27,18 @@ public class UserDeleteOperationsDAO {
             //kucharz ma id 4
             while (resultSet.next()) {
                 long tutorialId = resultSet.getLong("id");
-                String deleteTutorialMainIngredients = "DELETE FROM tutorials_ingredients WHERE tutorial_id = ?"; //poradnik kucharza to ma
+                String deleteTutorialMainIngredients = "DELETE FROM tutorials_ingredients WHERE tutorial_id = ?";
                 preparedStatement = connection.prepareStatement(deleteTutorialMainIngredients);
                 preparedStatement.setLong(1, tutorialId);
                 preparedStatement.execute();
             }
 
-            String deleteTutorialSql = "DELETE FROM tutorial WHERE author_id = ?"; //kucharz to ma
+            String deleteTutorialSql = "DELETE FROM tutorial WHERE author_id = ?";
             preparedStatement = connection.prepareStatement(deleteTutorialSql);
             preparedStatement.setLong(1, userId);
             preparedStatement.execute();
 
-            String deleteUserIngredientsSql = "DELETE FROM user_ingredients WHERE user_id = ?"; //kucharz to ma
+            String deleteUserIngredientsSql = "DELETE FROM user_ingredients WHERE user_id = ?";
             preparedStatement = connection.prepareStatement(deleteUserIngredientsSql);
             preparedStatement.setLong(1, userId);
             preparedStatement.execute();

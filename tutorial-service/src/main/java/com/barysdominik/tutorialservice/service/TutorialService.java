@@ -341,7 +341,6 @@ public class TutorialService {
         );
     }
 
-    //TODO use it
     public void changeShortDescription(String shortId, String newShortDescription) {
         Tutorial tutorial = tutorialRepository.findTutorialByShortId(shortId).orElse(null);
         if (tutorial != null) {
@@ -354,7 +353,6 @@ public class TutorialService {
         );
     }
 
-    //TODO use it
     public void changeSpecialParameters(String shortId, SpecialParametersDTO specialParametersDTO) {
         Tutorial tutorial = tutorialRepository.findTutorialByShortId(shortId).orElse(null);
         if (tutorial != null) {

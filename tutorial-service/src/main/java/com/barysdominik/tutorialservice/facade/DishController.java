@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-//TODO dodac endpointy do gateweaya
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(value = "/api/v1/dish")

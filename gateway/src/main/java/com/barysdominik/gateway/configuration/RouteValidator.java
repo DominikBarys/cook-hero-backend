@@ -13,8 +13,6 @@ import java.util.function.Predicate;
 
 @Component
 public class RouteValidator {
-
-    //TODO make user endpoints
     public Set<Endpoint> openApiEndpoints = new HashSet<>();
 
     private Set<Endpoint> adminEndpoints = new HashSet<>();
