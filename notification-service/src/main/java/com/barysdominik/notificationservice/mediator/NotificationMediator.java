@@ -73,4 +73,15 @@ public class NotificationMediator {
         }
     }
 
+    public ResponseEntity<Response> checkNotification(String shortId) {
+        try {
+            notificationService.checkNotification(shortId);
+            return ResponseEntity.ok(new Response("Notification with shortId: '" + shortId + "' checked successfully"));
+        } catch (NotificationNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                    new Response("Notification with shortId: '" + shortId + "' does not exist in database")
+            );
+        }
+    }
+
 }

@@ -9,6 +9,7 @@ import com.barysdominik.notificationservice.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -23,7 +24,7 @@ public class NotificationService {
         if (user != null) {
             return notificationRepository.findAllByReceiver(user);
         }
-        throw new UserNotFoundException("User with uuid: '" + userUuid + "' does not exist in database");
+        throw new UserNotFoundException("User with shortId: '" + userUuid + "' does not exist in database");
     }
 
     public Notification getNotification(String shortId) throws NotificationNotFoundException {
@@ -31,7 +32,7 @@ public class NotificationService {
         if (notification != null) {
             return notification;
         }
-        throw new NotificationNotFoundException("Notification with uuid: '" + shortId + "' does not exist in database");
+        throw new NotificationNotFoundException("Notification with shortId: '" + shortId + "' does not exist in database");
     }
 
     public void deleteNotification(String shortId) throws NotificationNotFoundException {
@@ -40,7 +41,7 @@ public class NotificationService {
             notificationRepository.delete(notification);
             return;
         }
-        throw new NotificationNotFoundException("Notification with uuid: '" + shortId + "' does not exist in database");
+        throw new NotificationNotFoundException("Notification with shortId: '" + shortId + "' does not exist in database");
     }
 
     public void deleteAllNotifications(String userUuid) throws NotificationNotFoundException {
@@ -52,5 +53,21 @@ public class NotificationService {
         }
         throw new NotificationNotFoundException("An unexpected error has occurred when deleting all notifications");
     }
+
+    public void checkNotification(String shortId) {
+        Notification notification = notificationRepository.getNotificationByShortId(shortId).orElse(null);
+        if(notification != null) {
+            notification.setChecked(true);
+            notificationRepository.save(notification);
+            return;
+        }
+        throw new NotificationNotFoundException("Notification with shortId: '" + shortId + "' does not exist in database");
+    }
+
+    public void createExpiredNotification(long userId, int quantity, String ingredientName, LocalDate expirationDate) {
+
+    }
+
+
 
 }

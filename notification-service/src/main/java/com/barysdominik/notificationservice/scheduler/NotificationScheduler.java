@@ -1,5 +1,7 @@
 package com.barysdominik.notificationservice.scheduler;
 
+import com.barysdominik.notificationservice.repository.dao.UserIngredientDao;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -10,12 +12,11 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class NotificationScheduler {
 
+    private final UserIngredientDao userIngredientDao;
 
-    @Scheduled(cron = "0 * * * * ?")
-    public void minuteTask() {
-        System.out.println("Co pełną minutę");
+    //@Scheduled(cron = "0 * * * * ?")
+    @PostConstruct
+    public void monitorUsersIngredients() {
+        userIngredientDao.checkUsersIngredientsExpirationDates();
     }
-
-
-
 }

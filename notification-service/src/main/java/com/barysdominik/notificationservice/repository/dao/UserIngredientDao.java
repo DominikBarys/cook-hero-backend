@@ -1,7 +1,9 @@
 package com.barysdominik.notificationservice.repository.dao;
 
 import com.barysdominik.notificationservice.entity.notification.Notification;
+import com.barysdominik.notificationservice.exception.IngredientNotFoundException;
 import com.barysdominik.notificationservice.repository.NotificationRepository;
+import com.barysdominik.notificationservice.service.NotificationService;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -14,7 +16,7 @@ import java.time.LocalDate;
 @RequiredArgsConstructor
 public class UserIngredientDao {
 
-    private final NotificationRepository notificationRepository;
+    private final NotificationService notificationService;
     @Value("${spring.datasource.url}")
     private String url;
     @Value("${spring.datasource.username}")
@@ -26,31 +28,37 @@ public class UserIngredientDao {
     public void checkUsersIngredientsExpirationDates() {
         try (Connection connection = DriverManager.getConnection(url, user, password)) {
             checkExpiredIngredients(connection);
-            checkIngredientsNearExpiration(connection);
-        } catch (SQLException e) {
-            e.printStackTrace();
+           // checkIngredientsNearExpiration(connection);
+        } catch (SQLException | IngredientNotFoundException sqlException) {
+            sqlException.printStackTrace();
         }
     }
 
+    //TODO continue this logic in service class
     private void checkExpiredIngredients(Connection connection) throws SQLException {
-        String sql = "SELECT short_id, user_id, expiration_date FROM user_ingredients WHERE expirationDate < ?";
+        String sql = "SELECT ingredient_id, quantity, user_id, expiration_date FROM user_ingredients WHERE expiration_date < ?";
         LocalDate currentDate = LocalDate.now();
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setDate(1, java.sql.Date.valueOf(currentDate));
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 while (resultSet.next()) {
-                    String shortId = resultSet.getString("short_id");
-                    String userId = resultSet.getString("user_id");
+                    long ingredientId = resultSet.getLong("ingredient_id");
+                    int quantity = resultSet.getInt("quantity");
+                    long userId = resultSet.getLong("user_id");
                     LocalDate expirationDate = resultSet.getDate("expiration_date").toLocalDate();
-
-                    System.out.println("Składnik o short id: " + shortId + " należący do usera o id: " + userId + " już się przeterminował");
+                    String ingredientName = getIngredientName(connection, ingredientId);
+                    if(ingredientName == null) {
+                        throw new IngredientNotFoundException("Ingredient with id: '" + ingredientId + "' does not exist in database");
+                    }
+                    notificationService.createExpiredNotification(userId, quantity, ingredientName, expirationDate);
                 }
             }
         }
     }
 
+    //TODO finish this method similar to method above
     private void checkIngredientsNearExpiration(Connection connection) throws SQLException {
-        String sql = "SELECT short_id, user_id, expiration_date FROM user_ingredients WHERE expirationDate <= ?";
+        String sql = "SELECT ingredient_id, user_id, expiration_date FROM user_ingredients WHERE expirationDate <= ?";
         LocalDate twoDaysFromNow = LocalDate.now().plusDays(2);
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setDate(1, java.sql.Date.valueOf(twoDaysFromNow));
@@ -61,10 +69,21 @@ public class UserIngredientDao {
                     LocalDate expirationDate = resultSet.getDate("expiration_date").toLocalDate();
 
                     if(!(LocalDate.now().isAfter(expirationDate))) {
-                        System.out.println("Składnik o short id: " + shortId + " należący do usera o id: " + userId + " za niedługo się przeterminuje");
                     }
-
                 }
+            }
+        }
+    }
+
+    private String getIngredientName(Connection connection, long ingredientId) throws SQLException{
+        String selectIngredientNameSql = "SELECT name FROM ingredient WHERE id = ?";
+        try(PreparedStatement ingredientPreparedStatement = connection.prepareStatement(selectIngredientNameSql)) {
+            ingredientPreparedStatement.setLong(1, ingredientId);
+            try(ResultSet ingredientResultSet = ingredientPreparedStatement.executeQuery()) {
+                if(ingredientResultSet.next()) {
+                    return ingredientResultSet.getString("name");
+                }
+                return null;
             }
         }
     }

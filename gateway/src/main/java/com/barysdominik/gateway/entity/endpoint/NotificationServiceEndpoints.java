@@ -21,7 +21,8 @@ public class NotificationServiceEndpoints {
             new Endpoint("/api/v1/notification/all", HttpMethod.GET, Role.GUEST),
             new Endpoint("/api/v1/notification", HttpMethod.GET, Role.GUEST),
             new Endpoint("/api/v1/notification/all", HttpMethod.DELETE, Role.GUEST),
-            new Endpoint("/api/v1/notification", HttpMethod.DELETE, Role.GUEST)
+            new Endpoint("/api/v1/notification", HttpMethod.DELETE, Role.GUEST),
+            new Endpoint("/api/v1/notification", HttpMethod.PATCH, Role.GUEST)
     ));
 
     @PostConstruct

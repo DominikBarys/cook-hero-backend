@@ -46,4 +46,9 @@ public class NotificationController {
         return notificationMediator.deleteNotification(shortId);
     }
 
+    @PatchMapping
+    public ResponseEntity<Response> checkNotification(@RequestParam String shortId) {
+        return notificationMediator.checkNotification(shortId);
+    }
+
 }
