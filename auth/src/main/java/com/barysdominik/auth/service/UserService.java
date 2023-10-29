@@ -285,7 +285,7 @@ public class UserService {
     }
 
     @Transactional
-    public void changeRole(HttpServletRequest request, String role) {
+    public void changeRole(HttpServletRequest request, String uuid, String role) {
         User user;
         try{
             user = getUserByRefreshToken(request);
@@ -293,34 +293,18 @@ public class UserService {
             throw new CannotAuthorizeByTokenException("Tokens are null or expired");
         }
 
-        List<Role> roles = Arrays.stream(Role.values()).toList();
+        User userToChangeRole = userRepository.findUserByUuid(uuid).orElse(null);
+        if(userToChangeRole != null) {
+            List<Role> roles = Arrays.stream(Role.values()).toList();
 
-        if(roles.stream().anyMatch(name -> name.toString().equals(role))) {
-            user.setRole(Role.valueOf(role));
-            userRepository.save(user);
-            log.info("User role changed successfully");
-            return;
-        }
-        throw new InvalidParamException("Given params are incorrect");
-    }
-
-    @Transactional
-    public void changeRank(HttpServletRequest request, String rank) {
-        User user;
-        try{
-            user = getUserByRefreshToken(request);
-        } catch (Exception e) {
-            throw new CannotAuthorizeByTokenException("Tokens are null or expired");
+            if(roles.stream().anyMatch(name -> name.toString().equals(role))) {
+                userToChangeRole.setRole(Role.valueOf(role));
+                userRepository.save(userToChangeRole);
+                log.info("User role changed successfully");
+                return;
+            }
         }
 
-        List<Rank> ranks = Arrays.stream(Rank.values()).toList();
-
-        if(ranks.stream().anyMatch(name -> name.toString().equals(rank))) {
-            user.setRank(Rank.valueOf(rank));
-            userRepository.save(user);
-            log.info("User role changed successfully");
-            return;
-        }
         throw new InvalidParamException("Given params are incorrect");
     }
 

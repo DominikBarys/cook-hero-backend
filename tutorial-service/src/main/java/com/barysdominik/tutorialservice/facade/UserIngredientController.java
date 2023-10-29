@@ -10,6 +10,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/user-ingredient")
@@ -27,8 +29,8 @@ public class UserIngredientController {
     }
 
     @PostMapping
-    public ResponseEntity<Response> addUserIngredients(@RequestBody UserIngredientDTO userIngredientDTO) {
-        return userIngredientMediator.addUserIngredients(userIngredientDTO);
+    public ResponseEntity<Response> addUserIngredients(@RequestBody List<UserIngredientDTO> userIngredientDTOS) {
+        return userIngredientMediator.addUserIngredients(userIngredientDTOS);
     }
 
     @PatchMapping

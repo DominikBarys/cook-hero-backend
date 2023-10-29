@@ -9,6 +9,7 @@ import com.barysdominik.tutorialservice.mapper.useringredient.UserIngredientDTOT
 import com.barysdominik.tutorialservice.mapper.useringredient.UserIngredientToUserIngredientDTO;
 import com.barysdominik.tutorialservice.service.UserIngredientService;
 import lombok.RequiredArgsConstructor;
+import org.mapstruct.control.MappingControl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
@@ -34,11 +35,15 @@ public class UserIngredientMediator {
         return ResponseEntity.ok(userIngredientDTOS);
     }
 
-    public ResponseEntity<Response> addUserIngredients(UserIngredientDTO userIngredientDTO) {
+    public ResponseEntity<Response> addUserIngredients(List<UserIngredientDTO> userIngredientDTOS) {
         try {
-            UserIngredient userIngredient =
-                    userIngredientDTOToUserIngredient.mapUserIngredientDTOToUserIngredient(userIngredientDTO);
-            userIngredientService.addUserIngredient(userIngredient);
+            List<UserIngredient> ingredientsToAddToUser = new ArrayList<>();
+            for(UserIngredientDTO userIngredient : userIngredientDTOS) {
+                ingredientsToAddToUser.add(
+                        userIngredientDTOToUserIngredient.mapUserIngredientDTOToUserIngredient(userIngredient)
+                );
+            }
+            userIngredientService.addUserIngredient(ingredientsToAddToUser);
             return ResponseEntity.ok(new Response("User ingredient created successfully"));
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)

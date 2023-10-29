@@ -46,7 +46,6 @@ public class IngredientService {
 
     @Transactional
     public void deleteIngredient(String shortId) throws ObjectDoesNotExistInDatabaseException{
-        //TODO ingredient trzeba też usunac z usera?
         Ingredient ingredient = ingredientRepository.findIngredientByShortId(shortId).orElse(null);
         if (ingredient != null) {
             long ingredientID = ingredient.getId();
@@ -58,18 +57,12 @@ public class IngredientService {
             }
             List<UserIngredient> userIngredients = userIngredientRepository.findUserIngredientsByIngredient(ingredient);
             userIngredientRepository.deleteAll(userIngredients);
+            ingredientRepository.delete(ingredient);
             return;
         }
         throw new ObjectDoesNotExistInDatabaseException(
                 "Ingredient with shortId: '" + shortId + "' does not exist in database"
         );
     }
-
-
-    //TODO pamietaj o dodaniu endpointow
-
-
-
-    //TODO przypisanie ingredienta do tutoriala i tworzenie ingredienta, mozliwe ze tylko 2 endpointy
 
 }

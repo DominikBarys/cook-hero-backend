@@ -21,8 +21,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class TutorialToTutorialDTO {
 
-    //TODO dodac tutaj to samo na wzor kategorii do disha autora i ingredientsow
-
     private final CategoryRepository categoryRepository;
 
     public TutorialDTO mapTutorialToTutorialDTO(Tutorial tutorial) {
@@ -33,10 +31,18 @@ public class TutorialToTutorialDTO {
         tutorialDTO.setImageUrls(tutorial.getImageUrls());
         tutorialDTO.setShortDescription(tutorial.getShortDescription());
         tutorialDTO.setParameters(tutorial.getParameters());
+        tutorialDTO.setCreationDate(tutorial.getCreationDate());
         tutorialDTO.setDishDTO(createDishDTO(tutorial.getDish()));
         tutorialDTO.setMainIngredientsDTOS(createIngredientsDTOS(tutorial.getMainIngredients()));
         tutorialDTO.setCategoryDTO(createCategoryDTO(tutorial.getCategory()));
         tutorialDTO.setAuthorDTO(createUserDTO(tutorial.getAuthor()));
+
+        tutorialDTO.setName(tutorial.getName());
+        tutorialDTO.setHasMeat(tutorial.isHasMeat());
+        tutorialDTO.setVeganRecipe(tutorial.isVeganRecipe());
+        tutorialDTO.setSweetRecipe(tutorial.isSweetRecipe());
+        tutorialDTO.setSpicyRecipe(tutorial.isSpicyRecipe());
+
         return tutorialDTO;
     }
 

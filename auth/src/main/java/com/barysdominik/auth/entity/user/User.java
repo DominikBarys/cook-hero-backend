@@ -19,7 +19,6 @@ import java.util.UUID;
 @Entity
 @AllArgsConstructor
 public class User implements UserDetails {
-    //TODO delete amount of reviews
     @Id
     @GeneratedValue(generator = "users_id_seq", strategy = GenerationType.SEQUENCE)
     @SequenceGenerator(name = "users_id_seq", sequenceName = "users_id_seq", allocationSize = 1)
@@ -34,7 +33,6 @@ public class User implements UserDetails {
     private Rank rank;
     private LocalDate joinedAt;
     private int amountOfCreatedTutorials;
-    private int amountOfReviews;
     @Column(name = "islock", columnDefinition = "boolean default true")
     private boolean isLock;
     @Column(name = "isenabled", columnDefinition = "boolean default false")
@@ -52,7 +50,6 @@ public class User implements UserDetails {
             Rank rank,
             LocalDate joinedAt,
             int amountOfCreatedTutorials,
-            int amountOfReviews,
             boolean isLock,
             boolean isEnabled
     ) {
@@ -63,7 +60,6 @@ public class User implements UserDetails {
         this.rank = rank;
         this.joinedAt = joinedAt;
         this.amountOfCreatedTutorials = amountOfCreatedTutorials;
-        this.amountOfReviews = amountOfReviews;
         this.isLock = isLock;
         this.isEnabled = isEnabled;
         generateUuid();

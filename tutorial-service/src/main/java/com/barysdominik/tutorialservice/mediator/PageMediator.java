@@ -1,6 +1,7 @@
 package com.barysdominik.tutorialservice.mediator;
 
 import com.barysdominik.tutorialservice.entity.http.Response;
+import com.barysdominik.tutorialservice.entity.page.ChangePageContentDTO;
 import com.barysdominik.tutorialservice.entity.page.Page;
 import com.barysdominik.tutorialservice.entity.page.PageDTO;
 import com.barysdominik.tutorialservice.exception.ObjectDoesNotExistInDatabaseException;
@@ -22,6 +23,10 @@ public class PageMediator {
 
     public ResponseEntity<PageDTO> getPage(String tutorialShortId, int pageNumber)
             throws ObjectDoesNotExistInDatabaseException {
+        if (pageNumber <= 0) {
+            pageNumber = 1;
+        }
+
         Page page = pageService.getPage(tutorialShortId, pageNumber);
         PageDTO pageDTO = pageToPageDTO.mapPageToPageDTO(page);
         long totalCount = pageService.countPages(tutorialShortId);
@@ -42,9 +47,12 @@ public class PageMediator {
         }
     }
 
-    public ResponseEntity<Response> changePageHtmlContent(String shortId, String newHtmlContent) {
+    public ResponseEntity<Response> changePageHtmlContent(ChangePageContentDTO changePageContentDTO) {
         try {
-            pageService.changePageHtmlContent(shortId, newHtmlContent);
+            pageService.changePageHtmlContent(
+                    changePageContentDTO.getShortId(),
+                    changePageContentDTO.getNewHtmlContent()
+            );
             return ResponseEntity.ok(new Response("Html content changed successfully"));
         } catch (ObjectDoesNotExistInDatabaseException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)

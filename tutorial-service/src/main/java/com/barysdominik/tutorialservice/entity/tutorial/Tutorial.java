@@ -27,16 +27,13 @@ public class Tutorial {
     private long id;
     private String shortId;
     private String name;
-    @Column(nullable = false)
     private int timeToPrepare;
-    @Column(nullable = false)
     private int difficulty;
-    @Column(nullable = false)
     private LocalDate creationDate;//def
-    @Column(nullable = false)
     private String[] imageUrls;
-    @Column(nullable = false)
+    @Column(length = 2000)
     private String shortDescription;
+    @Column(length = 2000)
     private String parameters;
     private boolean hasMeat;
     private boolean isVeganRecipe;
@@ -62,6 +59,6 @@ public class Tutorial {
     @ManyToOne(
             cascade = {CascadeType.MERGE, CascadeType.PERSIST}
     )
-    @JoinColumn(name = "authorId", referencedColumnName = "id", nullable = false)
+    @JoinColumn(name = "authorId", referencedColumnName = "id")
     private User author;
 }

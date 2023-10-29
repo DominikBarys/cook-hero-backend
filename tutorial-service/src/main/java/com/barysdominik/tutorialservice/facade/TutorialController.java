@@ -25,7 +25,7 @@ public class TutorialController {
             @RequestParam(required = false, defaultValue = "creationDate") String _sort,
             @RequestParam(required = false, defaultValue = "desc") String _order,
             @RequestParam(required = false) String _shortId,
-            @RequestParam(required = false) String name_like,
+            @RequestParam(required = false) String name_like,//
             @RequestParam(required = false) String _dish,
             @RequestParam(required = false) String _category,
             @RequestParam(required = false) String _author,
@@ -64,6 +64,7 @@ public class TutorialController {
         return tutorialMediator.changeTutorialThumbnail(shortId, newThumbnailPosition);
     }
 
+    //TODO to do sprawdzenia, wgl wszystkie operacje zwiazane z image do sprawdzenia
     @PatchMapping("change-images")
     public ResponseEntity<Response> changeTutorialCarouselImages(
             @RequestParam String shortId,
@@ -96,6 +97,7 @@ public class TutorialController {
         return tutorialMediator.changeTutorialDish(shortId, dishShortId);
     }
 
+    //TODO this actually will set whole new array of ingredients, if we want to add, first we need to copy old ingredients
     @PatchMapping("/add-ingredients")
     public ResponseEntity<Response> addMainIngredientsToTutorial(
             @RequestBody List<IngredientDTO> ingredientDTOList,

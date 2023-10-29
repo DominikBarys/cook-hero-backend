@@ -24,5 +24,4 @@ public class TutorialFormDTO {
     private String[] mainIngredientsShortIds;
     private String categoryShortId;
     private String authorUuid;
-
 }

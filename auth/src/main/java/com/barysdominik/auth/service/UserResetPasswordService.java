@@ -7,6 +7,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
@@ -37,7 +38,7 @@ public class UserResetPasswordService {
         userResetPasswordRepository.findByUuid(uuid).ifPresent(userResetPasswordRepository::delete);
     }
 
-   // @Scheduled(cron = "0 0/40 * * * *")
+    @Scheduled(cron = "0 0/40 * * * *")
     protected void removeExpiredUserResetsOfPassword() {
         log.info("Removing expired user reset password data from database");
         List<UserResetPassword> userResetPasswords = userResetPasswordRepository.findExpiredOperations();

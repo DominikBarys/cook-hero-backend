@@ -1,6 +1,7 @@
 package com.barysdominik.tutorialservice.facade;
 
 import com.barysdominik.tutorialservice.entity.http.Response;
+import com.barysdominik.tutorialservice.entity.page.ChangePageContentDTO;
 import com.barysdominik.tutorialservice.entity.page.PageDTO;
 import com.barysdominik.tutorialservice.exception.ObjectDoesNotExistInDatabaseException;
 import com.barysdominik.tutorialservice.mediator.PageMediator;
@@ -31,11 +32,8 @@ public class PageController {
     }
 
     @PatchMapping
-    public ResponseEntity<Response> changePageHtmlContent(
-            @RequestParam String shortId,
-            @RequestParam String newHtmlContent
-    ) {
-        return pageMediator.changePageHtmlContent(shortId, newHtmlContent);
+    public ResponseEntity<Response> changePageHtmlContent(@RequestBody ChangePageContentDTO changePageContentDTO) {
+        return pageMediator.changePageHtmlContent(changePageContentDTO);
     }
 
     @DeleteMapping

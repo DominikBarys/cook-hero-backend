@@ -19,6 +19,7 @@ import java.util.List;
 @AllArgsConstructor
 public class TutorialDTO {
     //TODO zmienic to dish, mainIngredients i authorId na wzor kategorii
+    private String name;
     private String shortId;
     private int timeToPrepare;
     private int difficulty;
@@ -30,4 +31,8 @@ public class TutorialDTO {
     private List<IngredientDTO> mainIngredientsDTOS;
     private CategoryDTO categoryDTO;
     private UserDTO authorDTO;
+    private boolean hasMeat;
+    private boolean isVeganRecipe;
+    private boolean isSweetRecipe;
+    private boolean isSpicyRecipe;
 }

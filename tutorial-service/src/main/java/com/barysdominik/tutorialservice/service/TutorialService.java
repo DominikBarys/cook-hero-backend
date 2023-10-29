@@ -4,6 +4,7 @@ import com.barysdominik.tutorialservice.entity.category.Category;
 import com.barysdominik.tutorialservice.entity.dish.Dish;
 import com.barysdominik.tutorialservice.entity.ingredient.Ingredient;
 import com.barysdominik.tutorialservice.entity.ingredient.IngredientDTO;
+import com.barysdominik.tutorialservice.entity.page.Page;
 import com.barysdominik.tutorialservice.entity.tutorial.SpecialParametersDTO;
 import com.barysdominik.tutorialservice.entity.tutorial.Tutorial;
 import com.barysdominik.tutorialservice.exception.ObjectDoesNotExistInDatabaseException;
@@ -37,6 +38,7 @@ public class TutorialService {
     private final CategoryRepository categoryRepository;
     private final IngredientRepository ingredientRepository;
     private final UserRepository userRepository;
+    private final PageRepository pageRepository;
     @Value("${external.url.file-service}")
     private String FILE_SERVICE_EXTERNAL_URL;
 
@@ -388,24 +390,25 @@ public class TutorialService {
         }
     }
 
+    @Transactional
     public void delete(String shortId) {
-        tutorialRepository.findTutorialByShortId(shortId).ifPresentOrElse(
-                value -> {
-                    tutorialRepository.delete(value);
-                    for (String imageUrl : value.getImageUrls()) {
-                        try {
-                            //deleteImage(imageUrl); //TODO commented for testing purposes
-                        } catch (Exception ex) {
-                            throw new RuntimeException(
-                                    "Tutorial was deleted but there occurred a problem with deleting files"
-                            );
-                        }
-                    }
-                },
-                () -> {
-                    throw new RuntimeException("An unexpected error has occurred");
+        Tutorial tutorial = tutorialRepository.findTutorialByShortId(shortId).orElse(null);
+        if(tutorial != null) {
+            List<Page> tutorialPages = pageRepository.getPagesByTutorial(tutorial);
+            pageRepository.deleteAll(tutorialPages);
+            tutorialRepository.delete(tutorial);
+            for (String imageUrl : tutorial.getImageUrls()) {
+                try {
+                    //deleteImage(imageUrl); //TODO commented for testing purposes
+                } catch (Exception ex) {
+                    throw new RuntimeException(
+                            "Tutorial was deleted but there occurred a problem with deleting files"
+                    );
                 }
-        );
+            }
+            return;
+        }
+        throw new RuntimeException("An unexpected error has occurred");
     }
 
     private void deleteImage(String shortId) {

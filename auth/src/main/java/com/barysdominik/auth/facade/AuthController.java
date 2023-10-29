@@ -28,7 +28,7 @@ public class AuthController {
 
     private final UserService userService;
 
-    @GetMapping("/activate")
+    @GetMapping("/activate") //
     public ResponseEntity<AuthResponse> activate(@RequestParam String uuid) {
         try {
             userService.activate(uuid);
@@ -40,17 +40,17 @@ public class AuthController {
         }
     }
 
-    @GetMapping("/auto-login")
+    @GetMapping("/auto-login") //
     public ResponseEntity<?> autoLogin(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
         return userService.autoLogin(httpServletRequest, httpServletResponse);
     }
 
-    @GetMapping("/logged-in")
+    @GetMapping("/logged-in") //
     public ResponseEntity<?> isLoggedIn(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
         return userService.isLoggedIn(httpServletRequest, httpServletResponse);
     }
 
-    @GetMapping("/logout")
+    @GetMapping("/logout") //
     public ResponseEntity<?> logout(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
         return userService.logout(httpServletRequest, httpServletResponse);
     }
@@ -124,25 +124,13 @@ public class AuthController {
     }
 
     @PatchMapping("/change-role")
-    public ResponseEntity<?> changeRole(HttpServletRequest httpServletRequest, @RequestParam String role) {
+    public ResponseEntity<?> changeRole(
+            HttpServletRequest httpServletRequest,
+            @RequestParam String uuid,
+            @RequestParam String role
+    ) {
         try {
-            userService.changeRole(httpServletRequest, role);
-            return ResponseEntity.ok(new AuthResponse(Code.SUCCESS));
-        } catch (CannotAuthorizeByTokenException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
-                    new AuthResponse(Code.INVALID_TOKEN)
-            );
-        } catch (InvalidParamException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
-                    new AuthResponse(Code.INVALID_PARAMETERS)
-            );
-        }
-    }
-
-    @PatchMapping("/change-rank")
-    public ResponseEntity<?> changeRank(HttpServletRequest httpServletRequest, @RequestParam String rank) {
-        try {
-            userService.changeRank(httpServletRequest, rank);
+            userService.changeRole(httpServletRequest, uuid, role);
             return ResponseEntity.ok(new AuthResponse(Code.SUCCESS));
         } catch (CannotAuthorizeByTokenException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(

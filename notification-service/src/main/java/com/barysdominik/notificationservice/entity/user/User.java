@@ -27,7 +27,6 @@ public class User {
     private Rank rank;
     private LocalDate joinedAt;
     private int amountOfCreatedTutorials;
-    private int amountOfReviews;
     @Column(name = "islock", columnDefinition = "boolean default true")
     private boolean isLock;
     @Column(name = "isenabled", columnDefinition = "boolean default false")
