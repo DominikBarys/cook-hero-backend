@@ -48,6 +48,22 @@ public class UserService {
     @Value("${jwt.refresh}")
     private int refreshExp;
 
+    public ResponseEntity<UserDTO> getUser(HttpServletRequest request) {
+        User user = getUserByRefreshToken(request);
+        if (user != null) {
+            UserDTO userDTO = new UserDTO();
+            userDTO.setUuid(user.getUuid());
+            userDTO.setUsername(user.getUsername());
+            userDTO.setEmail(user.getEmail());
+            userDTO.setRole(user.getRole().toString());
+            userDTO.setRank(user.getRank().toString());
+            userDTO.setJoinedAt(user.getJoinedAt());
+            userDTO.setAmountOfCreatedTutorials(user.getAmountOfCreatedTutorials());
+            return ResponseEntity.ok(userDTO);
+        }
+        throw new UserDontExistException();
+    }
+
     @Transactional
     public void activate(String uuid) throws UserDontExistException {
         User user = userRepository.findUserByUuid(uuid).orElse(null);

@@ -3,10 +3,7 @@ package com.barysdominik.auth.facade;
 import com.barysdominik.auth.entity.http.AuthResponse;
 import com.barysdominik.auth.entity.http.Code;
 import com.barysdominik.auth.entity.http.ValidationMessage;
-import com.barysdominik.auth.entity.user.ChangePasswordDTO;
-import com.barysdominik.auth.entity.user.ResetPasswordDTO;
-import com.barysdominik.auth.entity.user.User;
-import com.barysdominik.auth.entity.user.UserRegisterDTO;
+import com.barysdominik.auth.entity.user.*;
 import com.barysdominik.auth.exception.*;
 import com.barysdominik.auth.service.UserService;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -27,6 +24,17 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
 
     private final UserService userService;
+
+    @GetMapping
+    public ResponseEntity<?> getUser(HttpServletRequest httpServletRequest) {
+        try {
+            return userService.getUser(httpServletRequest);
+        } catch (UserDontExistException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                    new AuthResponse(Code.USER_DO_NOT_EXISTS_OR_ACCOUNT_NOT_ACTIVATED)
+            );
+        }
+    }
 
     @GetMapping("/activate") //
     public ResponseEntity<AuthResponse> activate(@RequestParam String uuid) {
