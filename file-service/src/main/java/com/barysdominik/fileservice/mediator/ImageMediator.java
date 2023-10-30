@@ -28,7 +28,6 @@ public class ImageMediator {
                     .substring(multipartFile.getOriginalFilename().lastIndexOf(".")+1).equals("png")) {
                 Image image = ftpService.uploadFileToFtp(multipartFile);
                 image = imageService.save(image);
-                imageService.save(image);
                 return ResponseEntity.ok(
                         ImageDTO.builder()
                                 .shortId(image.getShortId())

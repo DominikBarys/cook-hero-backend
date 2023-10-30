@@ -44,16 +44,6 @@ public class TutorialService {
     @Value("${external.url.file-service}")
     private String FILE_SERVICE_EXTERNAL_URL;
 
-    //na ich podstawie bedzie potem sortowanie
-//    Integer timeToPrepare,
-//    Integer difficulty,
-//    LocalDate creationDate,
-//    Integer rating,
-
-    //name, price_min, price_max, timeToPrepare, difficulty, creationDate
-    //rating, dish, ingredients, category, author, uuid
-    //ZAKLADAMY ZE JAK PRZYCISK NIE JEST WCISNIETY TO BOOLEANY SA FALSE
-
     public long countSearchedResults(
             String name,
             String dishShortId,
