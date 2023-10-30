@@ -20,7 +20,7 @@ public class TestClass {
 //
 //    @PostConstruct
 //    public void promote() {
-//        User userToChangeRole = userRepository.findUserByUuid("cc1728e7-b516-4c6b-b335-4e1c5d79b9ff").orElse(null);
+//        User userToChangeRole = userRepository.findUserByUuid("8526b993-7a7a-42f2-9e8d-a9e2111c654e").orElse(null);
 //        if(userToChangeRole != null) {
 //            List<Role> roles = Arrays.stream(Role.values()).toList();
 //

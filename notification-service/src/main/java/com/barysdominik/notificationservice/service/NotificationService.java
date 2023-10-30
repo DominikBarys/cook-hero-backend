@@ -1,16 +1,19 @@
 package com.barysdominik.notificationservice.service;
 
 import com.barysdominik.notificationservice.entity.notification.Notification;
+import com.barysdominik.notificationservice.entity.notification.NotificationType;
 import com.barysdominik.notificationservice.entity.user.User;
 import com.barysdominik.notificationservice.exception.NotificationNotFoundException;
 import com.barysdominik.notificationservice.exception.UserNotFoundException;
 import com.barysdominik.notificationservice.repository.NotificationRepository;
 import com.barysdominik.notificationservice.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.aspectj.weaver.ast.Not;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -54,9 +57,9 @@ public class NotificationService {
         throw new NotificationNotFoundException("An unexpected error has occurred when deleting all notifications");
     }
 
-    public void checkNotification(String shortId) {
+    public void checkNotification(String shortId) throws NotificationNotFoundException{
         Notification notification = notificationRepository.getNotificationByShortId(shortId).orElse(null);
-        if(notification != null) {
+        if (notification != null) {
             notification.setChecked(true);
             notificationRepository.save(notification);
             return;
@@ -64,10 +67,27 @@ public class NotificationService {
         throw new NotificationNotFoundException("Notification with shortId: '" + shortId + "' does not exist in database");
     }
 
-    public void createExpiredNotification(long userId, int quantity, String ingredientName, LocalDate expirationDate) {
+    public void createExpiredNotification(long userId, int quantity, String ingredientName, LocalDate expirationDate)
+            throws UserNotFoundException {
+        User user = userRepository.findById(userId).orElse(null);
+        if (user != null) {
+            Notification notification = new Notification();
+            notification.setShortId(UUID.randomUUID().toString().replace("-", "").substring(0, 12));
+            notification.setCreationDate(LocalDate.now());
+            notification.setType(NotificationType.CRITICAL);
+            notification.setReceiver(user);
 
+            String notificationMessage = "Składnik '" + ingredientName + "' w ilości " + quantity +
+                    "został przeterminowany :( Miał datę ważności do: " + expirationDate +
+                    ". Zalecamy pozbyć się tego składnika i najlepiej usunąć go również z wirtualnej lodówki.";
+
+            notification.setMessage(notificationMessage);
+            notificationRepository.save(notification);
+
+            return;
+        }
+        throw new UserNotFoundException("User was not found");
     }
-
 
 
 }
