@@ -14,8 +14,7 @@ public class NotificationScheduler {
 
     private final UserIngredientDao userIngredientDao;
 
-    //@Scheduled(cron = "0 0 6 * * ?")
-    @PostConstruct
+    @Scheduled(cron = "0 0 6 * * ?")
     public void monitorUsersIngredients() {
         userIngredientDao.checkUsersIngredientsExpirationDates();
     }

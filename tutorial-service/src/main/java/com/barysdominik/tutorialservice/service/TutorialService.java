@@ -7,6 +7,8 @@ import com.barysdominik.tutorialservice.entity.ingredient.IngredientDTO;
 import com.barysdominik.tutorialservice.entity.page.Page;
 import com.barysdominik.tutorialservice.entity.tutorial.SpecialParametersDTO;
 import com.barysdominik.tutorialservice.entity.tutorial.Tutorial;
+import com.barysdominik.tutorialservice.entity.user.Rank;
+import com.barysdominik.tutorialservice.entity.user.User;
 import com.barysdominik.tutorialservice.exception.ObjectDoesNotExistInDatabaseException;
 import com.barysdominik.tutorialservice.repository.*;
 import jakarta.persistence.EntityManager;
@@ -196,10 +198,24 @@ public class TutorialService {
     }
 
     @Transactional
-    public void createTutorial(Tutorial tutorial) {
+    public void createTutorial(Tutorial tutorial){
+
+        User user = tutorial.getAuthor();
+
+        int userAmountOfCreatedTutorials = user.getAmountOfCreatedTutorials();
+        user.setAmountOfCreatedTutorials(++userAmountOfCreatedTutorials);
+
+        if (user.getAmountOfCreatedTutorials() >= 2 && user.getAmountOfCreatedTutorials() < 5) {
+            user.setRank(Rank.ADVANCED);
+        }
+        if(user.getAmountOfCreatedTutorials() >= 5) {
+            user.setRank(Rank.MASTERCHEF);
+        }
+
         tutorial.setCreationDate(LocalDate.now());
         tutorial.setShortId(UUID.randomUUID().toString().replace("-", "").substring(0, 12));
         tutorialRepository.save(tutorial);
+        userRepository.save(user);
 
         for (String imageUrl : tutorial.getImageUrls()) {
             activateImage(imageUrl);

@@ -10,7 +10,6 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class SimpleTutorialDTO {
-    //TODO add mapper
     private String name; //
     private int timeToPrepare;//
     private int difficulty;//

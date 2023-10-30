@@ -22,7 +22,7 @@ public class Page {
     private int pageNumber;
     //TODO mozliwe ze htmlContent bedzie tablica i bedzie druga tablica z adresami do zdjec
     // da to efekt tego ze pod danym kawalkiem html bedzie zdjecie itd.
-    @Column(length = 1048576)
+    @Column(columnDefinition = "varchar(1048576)")
     private String htmlContent;
     @ManyToOne
     @JoinColumn(name = "tutorialId", referencedColumnName = "id")

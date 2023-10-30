@@ -3,7 +3,6 @@ package com.barysdominik.tutorialservice.entity.tutorial;
 import com.barysdominik.tutorialservice.entity.category.CategoryDTO;
 import com.barysdominik.tutorialservice.entity.dish.DishDTO;
 import com.barysdominik.tutorialservice.entity.ingredient.IngredientDTO;
-import com.barysdominik.tutorialservice.entity.user.User;
 import com.barysdominik.tutorialservice.entity.user.UserDTO;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

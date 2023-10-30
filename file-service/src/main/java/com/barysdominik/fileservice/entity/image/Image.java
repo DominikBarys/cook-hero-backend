@@ -18,6 +18,7 @@ public class Image {
     @SequenceGenerator(name = "image_id_seq", sequenceName = "image_id_seq")
     private long id;
     private String shortId;
+    @Column(columnDefinition = "varchar(1024)")
     private String path;
     private boolean isUsed;
     private LocalDate createdAt;

@@ -2,6 +2,7 @@ package com.barysdominik.notificationservice.repository.dao;
 
 import com.barysdominik.notificationservice.entity.notification.Notification;
 import com.barysdominik.notificationservice.exception.IngredientNotFoundException;
+import com.barysdominik.notificationservice.exception.UserNotFoundException;
 import com.barysdominik.notificationservice.repository.NotificationRepository;
 import com.barysdominik.notificationservice.service.NotificationService;
 import jakarta.annotation.PostConstruct;
@@ -28,14 +29,14 @@ public class UserIngredientDao {
     public void checkUsersIngredientsExpirationDates() {
         try (Connection connection = DriverManager.getConnection(url, user, password)) {
             checkExpiredIngredients(connection);
-           // checkIngredientsNearExpiration(connection);
-        } catch (SQLException | IngredientNotFoundException sqlException) {
-            sqlException.printStackTrace();
+            checkIngredientsNearExpiration(connection);
+        } catch (SQLException | IngredientNotFoundException | UserNotFoundException e) {
+            e.printStackTrace();
         }
     }
 
-    //TODO continue this logic in service class
-    private void checkExpiredIngredients(Connection connection) throws SQLException {
+    private void checkExpiredIngredients(Connection connection)
+            throws SQLException, IngredientNotFoundException, UserNotFoundException {
         String sql = "SELECT ingredient_id, quantity, user_id, expiration_date FROM user_ingredients WHERE expiration_date < ?";
         LocalDate currentDate = LocalDate.now();
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
@@ -56,19 +57,26 @@ public class UserIngredientDao {
         }
     }
 
-    //TODO finish this method similar to method above
     private void checkIngredientsNearExpiration(Connection connection) throws SQLException {
-        String sql = "SELECT ingredient_id, user_id, expiration_date FROM user_ingredients WHERE expirationDate <= ?";
+        String sql = "SELECT ingredient_id, quantity, user_id, expiration_date FROM user_ingredients WHERE expiration_date <= ?";
         LocalDate twoDaysFromNow = LocalDate.now().plusDays(2);
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setDate(1, java.sql.Date.valueOf(twoDaysFromNow));
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 while (resultSet.next()) {
-                    String shortId = resultSet.getString("short_id");
-                    String userId = resultSet.getString("user_id");
+                    long ingredientId = resultSet.getLong("ingredient_id");
+                    int quantity = resultSet.getInt("quantity");
+                    long userId = resultSet.getLong("user_id");
                     LocalDate expirationDate = resultSet.getDate("expiration_date").toLocalDate();
+                    String ingredientName = getIngredientName(connection, ingredientId);
 
                     if(!(LocalDate.now().isAfter(expirationDate))) {
+                        notificationService.createCloseToExpirationNotification(
+                                userId,
+                                quantity,
+                                ingredientName,
+                                expirationDate
+                        );
                     }
                 }
             }

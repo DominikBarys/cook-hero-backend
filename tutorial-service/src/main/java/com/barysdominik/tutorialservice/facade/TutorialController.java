@@ -52,7 +52,8 @@ public class TutorialController {
     }
 
     @PostMapping
-    public ResponseEntity<Response> saveTutorial(@RequestBody TutorialFormDTO tutorialDTO) {
+    public ResponseEntity<Response> saveTutorial(
+            @RequestBody TutorialFormDTO tutorialDTO) {
         return tutorialMediator.saveTutorial(tutorialDTO);
     }
 
