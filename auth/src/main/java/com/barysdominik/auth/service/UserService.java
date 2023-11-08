@@ -120,7 +120,7 @@ public class UserService {
             return ResponseEntity.ok(new LoginResponse(true, Code.SUCCESS));
         } catch (IllegalArgumentException | ExpiredJwtException e) {
             log.error("User is not logged in");
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new LoginResponse(false, Code.LOGIN_FAILED));
+            return ResponseEntity.ok(new LoginResponse(false, Code.LOGIN_FAILED));
         }
     }
 
