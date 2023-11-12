@@ -86,7 +86,7 @@ public class UserService {
                 log.info("User with username: '" + user.getUsername() + "' was auto logged successfully via token");
                 return ResponseEntity.ok(
                         UserRegisterDTO
-                                .builder()
+                                    .builder()
                                 .username(user.getUsername())
                                 .email(user.getEmail())
                                 .role(user.getRole())
@@ -208,7 +208,7 @@ public class UserService {
             }
         }
         log.error("User does not exist, is not enabled or is locked");
-        return ResponseEntity.ok(new AuthResponse(Code.USER_NOT_FOUND));
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new AuthResponse(Code.USER_NOT_FOUND));
     }
 
     public String generateToken(String username, int exp) {
@@ -286,6 +286,21 @@ public class UserService {
         log.error("User with uuid: '" + changePasswordDTO.getUuid() +
                 "' does not exist or reset password uuid has expired");
         throw new UserDontExistException("User with uuid: '" + changePasswordDTO.getUuid() + "' does not exist");
+    }
+
+    @Transactional
+    public void resetPasswordNoEmail(
+            HttpServletRequest request,
+            String newPassword
+    ) throws UserDontExistException {
+        User user;
+        try{
+            user = getUserByRefreshToken(request);
+        } catch (Exception e) {
+            throw new CannotAuthorizeByTokenException("Tokens are null or expired");
+        }
+        user.setPassword(newPassword);
+        saveUser(user);
     }
 
     @Transactional

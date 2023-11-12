@@ -17,6 +17,8 @@ public class AuthServiceEndpoints {
     private final RouteValidator routeValidator;
 
     private List<Endpoint> endpointList = new ArrayList<>(List.of(
+            new Endpoint("/auth/get-user", HttpMethod.GET, Role.GUEST),//
+            new Endpoint("/api/v1/auth/reset-password-no-email", HttpMethod.GET, Role.GUEST),//
             new Endpoint("/auth/logout", HttpMethod.GET, Role.GUEST),//
             new Endpoint("/auth/register", HttpMethod.POST, Role.GUEST),//
             new Endpoint("/auth/login", HttpMethod.POST, Role.GUEST),//

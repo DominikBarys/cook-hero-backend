@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,7 +26,8 @@ public class AuthController {
 
     private final UserService userService;
 
-    @GetMapping
+
+    @GetMapping("/get-user")
     public ResponseEntity<?> getUser(HttpServletRequest httpServletRequest) {
         try {
             return userService.getUser(httpServletRequest);
@@ -123,6 +125,21 @@ public class AuthController {
     public ResponseEntity<AuthResponse> changePassword(@RequestBody ChangePasswordDTO changePasswordDTO) {
         try {
             userService.resetPassword(changePasswordDTO);
+            return ResponseEntity.ok(new AuthResponse(Code.SUCCESS));
+        } catch (UserDontExistException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                    new AuthResponse(Code.USER_DO_NOT_EXISTS_OR_ACCOUNT_NOT_ACTIVATED)
+            );
+        }
+    }
+
+    @PatchMapping("/reset-password-no-email")
+    public ResponseEntity<AuthResponse> resetPasswordNoEmail(
+            HttpServletRequest httpServletRequest,
+            @RequestBody String newPassword
+    ) {
+        try {
+            userService.resetPasswordNoEmail(httpServletRequest, newPassword);
             return ResponseEntity.ok(new AuthResponse(Code.SUCCESS));
         } catch (UserDontExistException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
