@@ -11,6 +11,7 @@ import lombok.Setter;
 @AllArgsConstructor
 public class SimpleTutorialDTO {
     private String name; //
+    private String shortId;
     private int timeToPrepare;//
     private int difficulty;//
     private String imageUrl;//

@@ -1,7 +1,6 @@
 package com.barysdominik.tutorialservice.facade;
 
 import com.barysdominik.tutorialservice.entity.http.Response;
-import com.barysdominik.tutorialservice.entity.tutorial.SimpleTutorialDTO;
 import com.barysdominik.tutorialservice.exception.ObjectDoesNotExistInDatabaseException;
 import com.barysdominik.tutorialservice.mediator.AssistantMediator;
 import lombok.RequiredArgsConstructor;

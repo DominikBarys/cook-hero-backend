@@ -11,6 +11,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -77,8 +78,10 @@ public class AuthController {
         }
     }
 
+    @SneakyThrows
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody User user, HttpServletResponse httpServletResponse) {
+        Thread.sleep(5000);
         return userService.login(httpServletResponse, user);
     }
 

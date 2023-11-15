@@ -12,6 +12,7 @@ public class TutorialToSimpleTutorialDTO {
     public SimpleTutorialDTO mapTutorialToSimpleTutorialDTO(Tutorial tutorial) {
         SimpleTutorialDTO simpleTutorialDTO = new SimpleTutorialDTO();
         simpleTutorialDTO.setName(tutorial.getName());
+        simpleTutorialDTO.setShortId(tutorial.getShortId());
         simpleTutorialDTO.setTimeToPrepare(tutorial.getTimeToPrepare());
         simpleTutorialDTO.setDifficulty(tutorial.getDifficulty());
         simpleTutorialDTO.setImageUrl(getFirstImage(tutorial));
