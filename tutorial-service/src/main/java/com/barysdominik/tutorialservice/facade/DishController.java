@@ -48,7 +48,7 @@ public class DishController {
     }
 
     @DeleteMapping
-    public ResponseEntity<Response> deleteDish(String shortId) {
+    public ResponseEntity<Response> deleteDish(@RequestParam String shortId) {
         return dishMediator.deleteDish(shortId);
     }
 

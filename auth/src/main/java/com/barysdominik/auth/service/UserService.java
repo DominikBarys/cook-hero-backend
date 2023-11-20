@@ -26,6 +26,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -64,6 +65,23 @@ public class UserService {
         throw new UserDontExistException();
     }
 
+    public ResponseEntity<List<UserDTO>> getAllUsers(HttpServletRequest request) {
+        List<User> users = userRepository.findAll();
+        List<UserDTO> userDTOS = new ArrayList<>();
+        for (User user : users) {
+            UserDTO userDTO = new UserDTO();
+            userDTO.setUuid(user.getUuid());
+            userDTO.setUsername(user.getUsername());
+            userDTO.setEmail(user.getEmail());
+            userDTO.setRole(user.getRole().toString());
+            userDTO.setRank(user.getRank().toString());
+            userDTO.setJoinedAt(user.getJoinedAt());
+            userDTO.setAmountOfCreatedTutorials(user.getAmountOfCreatedTutorials());
+            userDTOS.add(userDTO);
+        }
+        return ResponseEntity.ok(userDTOS);
+    }
+
     @Transactional
     public void activate(String uuid) throws UserDontExistException {
         User user = userRepository.findUserByUuid(uuid).orElse(null);
@@ -86,7 +104,7 @@ public class UserService {
                 log.info("User with username: '" + user.getUsername() + "' was auto logged successfully via token");
                 return ResponseEntity.ok(
                         UserRegisterDTO
-                                    .builder()
+                                .builder()
                                 .username(user.getUsername())
                                 .email(user.getEmail())
                                 .role(user.getRole())
@@ -140,11 +158,11 @@ public class UserService {
     @Transactional
     public void register(UserRegisterDTO userRegisterDTO) throws DuplicateUsernameException, DuplicateMailException {
         userRepository.findUserByUsername(userRegisterDTO.getUsername()).ifPresent(value -> {
-            log.error("Username '" + userRegisterDTO.getUsername() +"' already exists");
+            log.error("Username '" + userRegisterDTO.getUsername() + "' already exists");
             throw new DuplicateUsernameException("Użytkownik o takiej nazwie już istnieje");
         });
         userRepository.findUserByEmail(userRegisterDTO.getEmail()).ifPresent(value -> {
-            log.error("Email '" + userRegisterDTO.getEmail() +"' already exists");
+            log.error("Email '" + userRegisterDTO.getEmail() + "' already exists");
             throw new DuplicateMailException("Użytkownik o takim mailu już istnieje");
         });
 
@@ -294,7 +312,7 @@ public class UserService {
             String newPassword
     ) throws UserDontExistException {
         User user;
-        try{
+        try {
             user = getUserByRefreshToken(request);
         } catch (Exception e) {
             throw new CannotAuthorizeByTokenException("Tokens are null or expired");
@@ -306,7 +324,7 @@ public class UserService {
     @Transactional
     public void changeUsername(HttpServletRequest request, String newUsername) {
         User user;
-        try{
+        try {
             user = getUserByRefreshToken(request);
         } catch (Exception e) {
             throw new CannotAuthorizeByTokenException("Tokens are null or expired");
@@ -318,17 +336,17 @@ public class UserService {
     @Transactional
     public void changeRole(HttpServletRequest request, String uuid, String role) {
         User user;
-        try{
+        try {
             user = getUserByRefreshToken(request);
         } catch (Exception e) {
             throw new CannotAuthorizeByTokenException("Tokens are null or expired");
         }
 
         User userToChangeRole = userRepository.findUserByUuid(uuid).orElse(null);
-        if(userToChangeRole != null) {
+        if (userToChangeRole != null) {
             List<Role> roles = Arrays.stream(Role.values()).toList();
 
-            if(roles.stream().anyMatch(name -> name.toString().equals(role))) {
+            if (roles.stream().anyMatch(name -> name.toString().equals(role))) {
                 userToChangeRole.setRole(Role.valueOf(role));
                 userRepository.save(userToChangeRole);
                 log.info("User role changed successfully");
@@ -342,16 +360,16 @@ public class UserService {
     @Transactional
     public void deleteUser(HttpServletRequest request, HttpServletResponse response, String uuid) {
         User user;
-        try{
-             user = getUserByRefreshToken(request);
+        try {
+            user = getUserByRefreshToken(request);
         } catch (Exception e) {
             throw new CannotAuthorizeByTokenException("Tokens are null or expired");
         }
 
         User userToDelete = userRepository.findUserByUuid(uuid).orElse(null);
 
-        if(user != null) {
-            if(userToDelete != null) {
+        if (user != null) {
+            if (userToDelete != null) {
                 userDeleteOperationsDAO.deleteUserOperations(userToDelete.getId());
                 userResetPasswordRepository.deleteAllByUser(userToDelete);
                 userRepository.delete(userToDelete);
@@ -365,7 +383,7 @@ public class UserService {
     public void authorize(HttpServletRequest request) throws UserDontExistException {
         String token = null;
         String refresh = null;
-        if(request.getCookies() != null) {
+        if (request.getCookies() != null) {
             for (Cookie value : Arrays.stream(request.getCookies()).toList()) {
                 if (value.getName().equals("token")) {
                     token = value.getValue();
@@ -377,15 +395,15 @@ public class UserService {
             throw new CannotAuthorizeByTokenException("Tokens are null or expired");
         }
 
-        if (token != null && !token.isEmpty()){
+        if (token != null && !token.isEmpty()) {
             String subject = jwtService.getSubject(token);
             userRepository.findAdmin(subject).orElseThrow(
-                    ()->new NoPermissionsException("User has no permission for this operation")
+                    () -> new NoPermissionsException("User has no permission for this operation")
             );
         } else if (refresh != null && !refresh.isEmpty()) {
             String subject = jwtService.getSubject(refresh);
             userRepository.findAdmin(subject).orElseThrow(
-                    ()->new NoPermissionsException("User has no permission for this operation")
+                    () -> new NoPermissionsException("User has no permission for this operation")
             );
         }
     }

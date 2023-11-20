@@ -32,10 +32,18 @@ public class TutorialToTutorialDTO {
         tutorialDTO.setShortDescription(tutorial.getShortDescription());
         tutorialDTO.setParameters(tutorial.getParameters());
         tutorialDTO.setCreationDate(tutorial.getCreationDate());
-        tutorialDTO.setDishDTO(createDishDTO(tutorial.getDish()));
-        tutorialDTO.setMainIngredientsDTOS(createIngredientsDTOS(tutorial.getMainIngredients()));
-        tutorialDTO.setCategoryDTO(createCategoryDTO(tutorial.getCategory()));
-        tutorialDTO.setAuthorDTO(createUserDTO(tutorial.getAuthor()));
+        if(tutorial.getDish() != null) {
+            tutorialDTO.setDishDTO(createDishDTO(tutorial.getDish()));
+        }
+        if(tutorial.getMainIngredients() != null) {
+            tutorialDTO.setMainIngredientsDTOS(createIngredientsDTOS(tutorial.getMainIngredients()));
+        }
+        if(tutorial.getCategory() != null) {
+            tutorialDTO.setCategoryDTO(createCategoryDTO(tutorial.getCategory()));
+        }
+        if(tutorial.getAuthor() != null) {
+            tutorialDTO.setAuthorDTO(createUserDTO(tutorial.getAuthor()));
+        }
 
         tutorialDTO.setName(tutorial.getName());
         tutorialDTO.setHasMeat(tutorial.isHasMeat());

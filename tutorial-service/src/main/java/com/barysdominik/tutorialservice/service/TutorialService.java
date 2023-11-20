@@ -27,6 +27,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -192,20 +193,22 @@ public class TutorialService {
 
         User user = tutorial.getAuthor();
 
-        int userAmountOfCreatedTutorials = user.getAmountOfCreatedTutorials();
-        user.setAmountOfCreatedTutorials(++userAmountOfCreatedTutorials);
+        if(user != null) {
+            int userAmountOfCreatedTutorials = user.getAmountOfCreatedTutorials();
+            user.setAmountOfCreatedTutorials(++userAmountOfCreatedTutorials);
 
-        if (user.getAmountOfCreatedTutorials() >= 2 && user.getAmountOfCreatedTutorials() < 5) {
-            user.setRank(Rank.ADVANCED);
-        }
-        if(user.getAmountOfCreatedTutorials() >= 5) {
-            user.setRank(Rank.MASTERCHEF);
+            if (user.getAmountOfCreatedTutorials() >= 2 && user.getAmountOfCreatedTutorials() < 5) {
+                user.setRank(Rank.ADVANCED);
+            }
+            if(user.getAmountOfCreatedTutorials() >= 5) {
+                user.setRank(Rank.MASTERCHEF);
+            }
+            userRepository.save(user);
         }
 
         tutorial.setCreationDate(LocalDate.now());
         tutorial.setShortId(UUID.randomUUID().toString().replace("-", "").substring(0, 12));
         tutorialRepository.save(tutorial);
-        userRepository.save(user);
 
         for (String imageUrl : tutorial.getImageUrls()) {
             activateImage(imageUrl);

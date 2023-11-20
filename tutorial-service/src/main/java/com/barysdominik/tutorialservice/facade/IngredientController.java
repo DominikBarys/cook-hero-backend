@@ -48,7 +48,7 @@ public class IngredientController {
     }
 
     @DeleteMapping
-    public ResponseEntity<Response> deleteIngredient(String shortId) {
+    public ResponseEntity<Response> deleteIngredient(@RequestParam String shortId) {
         return ingredientMediator.deleteIngredient(shortId);
     }
 

@@ -47,7 +47,7 @@ public class CategoryController {
     }
 
     @DeleteMapping
-    public ResponseEntity<Response> deleteCategory(String shortId){
+    public ResponseEntity<Response> deleteCategory(@RequestParam String shortId){
         return categoryMediator.deleteCategory(shortId);
     }
 

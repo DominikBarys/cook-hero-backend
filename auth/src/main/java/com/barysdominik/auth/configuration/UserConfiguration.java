@@ -46,7 +46,8 @@ public class UserConfiguration {
                         "/api/v1/auth/delete",
                         "/api/v1/auth/authorize",
                         "/api/v1/auth/get-user",
-                        "/api/v1/auth/reset-password-no-email"
+                        "/api/v1/auth/reset-password-no-email",
+                        "/api/v1/auth/all"
                         ).permitAll()
                 .and()
                 .build();

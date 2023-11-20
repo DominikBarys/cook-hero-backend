@@ -45,13 +45,17 @@ public class TutorialFormDTOToTutorial {
         tutorial.setCategory(category);
         Dish dish = dishRepository.findDishByShortId(tutorialFormDTO.getDishShortId()).orElse(null);
         tutorial.setDish(dish);
+
         List<Ingredient> ingredients = new ArrayList<>();
-        for(String ingredientShortId : tutorialFormDTO.getMainIngredientsShortIds()) {
-            Ingredient ingredient = ingredientRepository.findIngredientByShortId(ingredientShortId).orElse(null);
-            if(ingredient != null) {
-                ingredients.add(ingredient);
+        if(tutorialFormDTO.getMainIngredientsShortIds() != null) {
+            for(String ingredientShortId : tutorialFormDTO.getMainIngredientsShortIds()) {
+                Ingredient ingredient = ingredientRepository.findIngredientByShortId(ingredientShortId).orElse(null);
+                if(ingredient != null) {
+                    ingredients.add(ingredient);
+                }
             }
         }
+
         tutorial.setMainIngredients(ingredients);
         User user = userRepository.findUserByUuid(tutorialFormDTO.getAuthorUuid()).orElse(null);
         tutorial.setAuthor(user);

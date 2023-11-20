@@ -39,6 +39,17 @@ public class AuthController {
         }
     }
 
+    @GetMapping("/all")
+    public ResponseEntity<?> getAllUsers(HttpServletRequest httpServletRequest) {
+        try {
+            return userService.getAllUsers(httpServletRequest);
+        } catch (UserDontExistException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                    new AuthResponse(Code.USER_DO_NOT_EXISTS_OR_ACCOUNT_NOT_ACTIVATED)
+            );
+        }
+    }
+
     @GetMapping("/activate") //
     public ResponseEntity<AuthResponse> activate(@RequestParam String uuid) {
         try {
@@ -81,7 +92,7 @@ public class AuthController {
     @SneakyThrows
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody User user, HttpServletResponse httpServletResponse) {
-        Thread.sleep(5000);
+        Thread.sleep(2000);
         return userService.login(httpServletResponse, user);
     }
 
