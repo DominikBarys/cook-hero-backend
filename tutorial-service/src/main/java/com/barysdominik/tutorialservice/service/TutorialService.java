@@ -181,7 +181,7 @@ public class TutorialService {
             predicates.add(criteriaBuilder.isTrue(root.get("isSweetRecipe")));
         }
 
-        if (isSweetRecipe != null && isSpicyRecipe) {
+        if (isSpicyRecipe != null && isSpicyRecipe) {
             predicates.add(criteriaBuilder.isTrue(root.get("isSpicyRecipe")));
         }
 

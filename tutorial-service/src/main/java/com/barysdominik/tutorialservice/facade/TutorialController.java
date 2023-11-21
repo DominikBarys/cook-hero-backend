@@ -21,7 +21,7 @@ public class TutorialController {
     @GetMapping
     public ResponseEntity<?> get(
             @RequestParam(required = false, defaultValue = "1") int _page,
-            @RequestParam(required = false, defaultValue = "5") int _limit,
+            @RequestParam(required = false, defaultValue = "100") int _limit,
             @RequestParam(required = false, defaultValue = "creationDate") String _sort,
             @RequestParam(required = false, defaultValue = "desc") String _order,
             @RequestParam(required = false) String _shortId,
