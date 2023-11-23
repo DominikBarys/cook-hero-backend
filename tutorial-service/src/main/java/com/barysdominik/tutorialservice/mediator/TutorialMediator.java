@@ -1,5 +1,6 @@
 package com.barysdominik.tutorialservice.mediator;
 
+import com.barysdominik.tutorialservice.entity.http.CreateTutorialResponse;
 import com.barysdominik.tutorialservice.entity.http.Response;
 import com.barysdominik.tutorialservice.entity.ingredient.IngredientDTO;
 import com.barysdominik.tutorialservice.entity.tutorial.*;
@@ -101,14 +102,14 @@ public class TutorialMediator {
         return ResponseEntity.ok().body(tutorialDTO);
     }
 
-    public ResponseEntity<Response> saveTutorial(TutorialFormDTO tutorialFormDTO) {
+    public ResponseEntity<CreateTutorialResponse> saveTutorial(TutorialFormDTO tutorialFormDTO) {
         try {
             Tutorial tutorial = tutorialFormDTOToTutorial.mapTutorialFormDTOToTutorial(tutorialFormDTO);
             tutorialService.createTutorial(tutorial);
-            return ResponseEntity.ok(new Response("Tutorial created successfully"));
+            return ResponseEntity.ok(new CreateTutorialResponse("Tutorial created successfully", tutorial.getShortId()));
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(new Response("This type of category does not exist in database"));
+                    .body(new CreateTutorialResponse("Something went wrong while creating tutorial", null));
         }
     }
 

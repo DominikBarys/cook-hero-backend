@@ -13,6 +13,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Component
 @RequiredArgsConstructor
 public class PageMediator {
@@ -20,6 +23,24 @@ public class PageMediator {
     private final PageService pageService;
     private final PageToPageDTO pageToPageDTO;
     private final PageDTOToPage pageDTOToPage;
+
+    public ResponseEntity<List<PageDTO>> getAllPAges(String tutorialShortId)
+            throws ObjectDoesNotExistInDatabaseException {
+
+        List<Page> pages = pageService.getPages(tutorialShortId);
+
+        List<PageDTO> pageDTOS = new ArrayList<>();
+
+        for(Page page : pages) {
+            pageDTOS.add(pageToPageDTO.mapPageToPageDTO(page));
+        }
+
+        long totalCount = pageService.countPages(tutorialShortId);
+
+        return ResponseEntity.ok().header(
+                "X-Total-Count",
+                String.valueOf(totalCount)).body(pageDTOS);
+    }
 
     public ResponseEntity<PageDTO> getPage(String tutorialShortId, int pageNumber)
             throws ObjectDoesNotExistInDatabaseException {

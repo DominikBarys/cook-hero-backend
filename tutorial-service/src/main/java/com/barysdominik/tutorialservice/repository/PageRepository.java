@@ -15,4 +15,6 @@ public interface PageRepository extends JpaRepository<Page, Long> {
 
     long countPagesByTutorial(Tutorial tutorial);
 
+    List<Page> getAllByTutorial(Tutorial tutorial);
+
 }

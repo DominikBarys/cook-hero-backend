@@ -19,6 +19,17 @@ public class PageService {
     private final PageRepository pageRepository;
     private final TutorialRepository tutorialRepository;
 
+
+    public List<Page> getPages(String tutorialShortId) throws ObjectDoesNotExistInDatabaseException {
+        Tutorial tutorial = tutorialRepository.findTutorialByShortId(tutorialShortId).orElse(null);
+        if (tutorial != null) {
+            return pageRepository.getAllByTutorial(tutorial);
+        }
+        throw new ObjectDoesNotExistInDatabaseException(
+                "Any page with tutorial shortId: '" + tutorialShortId + "' does not exist in database"
+        );
+    }
+
     public Page getPage(String tutorialShortId, int pageNumber) throws ObjectDoesNotExistInDatabaseException {
         Tutorial tutorial = tutorialRepository.findTutorialByShortId(tutorialShortId).orElse(null);
         if (tutorial != null) {

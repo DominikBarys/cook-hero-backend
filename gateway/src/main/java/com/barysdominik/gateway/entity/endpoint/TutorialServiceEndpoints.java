@@ -45,6 +45,7 @@ public class TutorialServiceEndpoints {
             new Endpoint("/api/v1/ingredient", HttpMethod.POST, Role.ADMIN),
             new Endpoint("/api/v1/ingredient", HttpMethod.DELETE, Role.ADMIN),
             new Endpoint("/api/v1/page", HttpMethod.GET, Role.GUEST),
+            new Endpoint("/api/v1/page/all", HttpMethod.GET, Role.GUEST),
             new Endpoint("/api/v1/page", HttpMethod.POST, Role.GUEST),
             new Endpoint("/api/v1/page", HttpMethod.PATCH, Role.GUEST),
             new Endpoint("/api/v1/page", HttpMethod.DELETE, Role.GUEST),

@@ -1,5 +1,6 @@
 package com.barysdominik.tutorialservice.facade;
 
+import com.barysdominik.tutorialservice.entity.http.CreateTutorialResponse;
 import com.barysdominik.tutorialservice.entity.http.Response;
 import com.barysdominik.tutorialservice.entity.ingredient.IngredientDTO;
 import com.barysdominik.tutorialservice.entity.tutorial.SpecialParametersDTO;
@@ -52,7 +53,7 @@ public class TutorialController {
     }
 
     @PostMapping
-    public ResponseEntity<Response> saveTutorial(
+    public ResponseEntity<CreateTutorialResponse> saveTutorial(
             @RequestBody TutorialFormDTO tutorialDTO) {
         return tutorialMediator.saveTutorial(tutorialDTO);
     }

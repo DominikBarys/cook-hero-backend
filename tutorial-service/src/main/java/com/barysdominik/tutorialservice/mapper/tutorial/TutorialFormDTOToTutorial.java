@@ -35,7 +35,7 @@ public class TutorialFormDTOToTutorial {
         tutorial.setCreationDate(LocalDate.now()); //niepotrzebne
         tutorial.setImageUrls(tutorialFormDTO.getImagesUuid());
         tutorial.setShortDescription(tutorialFormDTO.getShortDescription());
-        tutorial.setParameters(tutorialFormDTO.getParameters());
+        tutorial.setParameters(tutorialFormDTO.getParameters()); // gfd tutaj
         tutorial.setHasMeat(tutorialFormDTO.isHasMeat());
         tutorial.setVeganRecipe(tutorialFormDTO.isVeganRecipe());
         tutorial.setSweetRecipe(tutorialFormDTO.isSweetRecipe());

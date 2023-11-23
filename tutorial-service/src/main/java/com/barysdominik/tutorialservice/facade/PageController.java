@@ -17,6 +17,15 @@ public class PageController {
 
     private final PageMediator pageMediator;
 
+    @GetMapping("/all")
+    public ResponseEntity<?> getAllPages(@RequestParam String tutorialShortId) {
+        try {
+            return pageMediator.getAllPAges(tutorialShortId);
+        } catch (ObjectDoesNotExistInDatabaseException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("An error has occurred when getting a page");
+        }
+    }
+
     @GetMapping
     public ResponseEntity<?> getPage(@RequestParam String tutorialShortId, @RequestParam int pageNumber) {
         try {
