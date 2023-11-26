@@ -7,6 +7,7 @@ import com.barysdominik.notificationservice.exception.NotificationNotFoundExcept
 import com.barysdominik.notificationservice.exception.UserNotFoundException;
 import com.barysdominik.notificationservice.repository.NotificationRepository;
 import com.barysdominik.notificationservice.repository.UserRepository;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.aspectj.weaver.ast.Not;
 import org.springframework.stereotype.Service;
@@ -21,6 +22,14 @@ public class NotificationService {
 
     private final NotificationRepository notificationRepository;
     private final UserRepository userRepository;
+
+//    createExpiredNotification(long userId, int quantity, String ingredientName, LocalDate expirationDate)
+    @PostConstruct
+    public void test() {
+        for(int i = 0; i < 50; i++) {
+            createExpiredNotification(4L, i, "Ziemniak", LocalDate.now());
+        }
+    }
 
     public List<Notification> getAllNotifications(String userUuid) throws UserNotFoundException {
         User user = userRepository.findUserByUuid(userUuid).orElse(null);
@@ -60,7 +69,8 @@ public class NotificationService {
     public void checkNotification(String shortId) throws NotificationNotFoundException{
         Notification notification = notificationRepository.getNotificationByShortId(shortId).orElse(null);
         if (notification != null) {
-            notification.setChecked(true);
+            boolean checked = notification.isChecked();
+            notification.setChecked(!checked);
             notificationRepository.save(notification);
             return;
         }
@@ -78,7 +88,7 @@ public class NotificationService {
             notification.setReceiver(user);
 
             String notificationMessage = "Składnik '" + ingredientName + "' w ilości " + quantity +
-                    "został przeterminowany :( Miał datę ważności do: " + expirationDate +
+                    " został przeterminowany :( Miał datę ważności do: " + expirationDate +
                     ". Zalecamy pozbyć się tego składnika i najlepiej usunąć go również z wirtualnej lodówki.";
 
             notification.setMessage(notificationMessage);

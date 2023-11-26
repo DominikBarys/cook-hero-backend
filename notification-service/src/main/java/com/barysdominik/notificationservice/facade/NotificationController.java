@@ -1,6 +1,5 @@
 package com.barysdominik.notificationservice.facade;
 
-
 import com.barysdominik.notificationservice.entity.http.Response;
 import com.barysdominik.notificationservice.exception.NotificationNotFoundException;
 import com.barysdominik.notificationservice.mediator.NotificationMediator;
@@ -46,7 +45,7 @@ public class NotificationController {
         return notificationMediator.deleteNotification(shortId);
     }
 
-    @PatchMapping
+    @PostMapping
     public ResponseEntity<Response> checkNotification(@RequestParam String shortId) {
         return notificationMediator.checkNotification(shortId);
     }
