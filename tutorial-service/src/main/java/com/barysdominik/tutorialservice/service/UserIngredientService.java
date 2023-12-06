@@ -30,11 +30,11 @@ public class UserIngredientService {
         );
     }
 
-    public void addUserIngredient(List<UserIngredient> userIngredients) {
-        for(UserIngredient userIngredient : userIngredients) {
-            userIngredient.setShortId(UUID.randomUUID().toString().replace("-", "").substring(0, 12));
-        }
-        userIngredientRepository.saveAll(userIngredients);
+    public void addUserIngredient(UserIngredient userIngredient) {
+
+        userIngredient.setShortId(UUID.randomUUID().toString().replace("-", "").substring(0, 12));
+
+        userIngredientRepository.save(userIngredient);
     }
 
     public void changeUserIngredient(ChangeUserIngredientDTO changeUserIngredientDTO)

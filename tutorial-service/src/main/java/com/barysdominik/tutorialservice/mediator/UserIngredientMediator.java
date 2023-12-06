@@ -35,15 +35,13 @@ public class UserIngredientMediator {
         return ResponseEntity.ok(userIngredientDTOS);
     }
 
-    public ResponseEntity<Response> addUserIngredients(List<UserIngredientDTO> userIngredientDTOS) {
+    public ResponseEntity<Response> addUserIngredients(UserIngredientDTO userIngredientDTO) {
         try {
-            List<UserIngredient> ingredientsToAddToUser = new ArrayList<>();
-            for(UserIngredientDTO userIngredient : userIngredientDTOS) {
-                ingredientsToAddToUser.add(
-                        userIngredientDTOToUserIngredient.mapUserIngredientDTOToUserIngredient(userIngredient)
-                );
-            }
-            userIngredientService.addUserIngredient(ingredientsToAddToUser);
+
+            UserIngredient userIngredient =
+                    userIngredientDTOToUserIngredient.mapUserIngredientDTOToUserIngredient(userIngredientDTO);
+
+            userIngredientService.addUserIngredient(userIngredient);
             return ResponseEntity.ok(new Response("User ingredient created successfully"));
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)

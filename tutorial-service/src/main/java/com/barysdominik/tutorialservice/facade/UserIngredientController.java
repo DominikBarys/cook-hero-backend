@@ -29,7 +29,7 @@ public class UserIngredientController {
     }
 
     @PostMapping
-    public ResponseEntity<Response> addUserIngredients(@RequestBody List<UserIngredientDTO> userIngredientDTOS) {
+    public ResponseEntity<Response> addUserIngredients(@RequestBody UserIngredientDTO userIngredientDTOS) {
         return userIngredientMediator.addUserIngredients(userIngredientDTOS);
     }
 
@@ -42,6 +42,5 @@ public class UserIngredientController {
     public ResponseEntity<Response> deleteUserIngredient(@RequestParam String shortId) {
         return userIngredientMediator.deleteUserIngredient(shortId);
     }
-
 
 }
