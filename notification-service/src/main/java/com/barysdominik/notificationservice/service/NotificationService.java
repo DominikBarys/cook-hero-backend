@@ -26,9 +26,9 @@ public class NotificationService {
 //    createExpiredNotification(long userId, int quantity, String ingredientName, LocalDate expirationDate)
     @PostConstruct
     public void test() {
-        for(int i = 0; i < 50; i++) {
-            createExpiredNotification(4L, i, "Ziemniak", LocalDate.now());
-        }
+//        for(int i = 0; i < 50; i++) {
+//            createExpiredNotification(4L, i, "Ziemniak", LocalDate.now());
+//        }
     }
 
     public List<Notification> getAllNotifications(String userUuid) throws UserNotFoundException {

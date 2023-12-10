@@ -39,6 +39,7 @@ public class FtpService {
     public void initFtpServer() {
         try {
             FTPClient ftpClient = getFtpConnection();
+            ftpClient.setConnectTimeout(5000);
             createDirectories(ftpClient);
             ftpClient.logout();
             ftpClient.disconnect();
@@ -84,6 +85,8 @@ public class FtpService {
 
     private FTPClient getFtpConnection() throws IOException {
         FTPClient ftpClient = new FTPClient();
+        ftpClient.setConnectTimeout(10000);
+        ftpClient.setControlKeepAliveTimeout(300);
         ftpClient.connect(FTP_SERVER, FTP_PORT);
         ftpClient.login(FTP_USERNAME, FTP_PASSWORD);
 
