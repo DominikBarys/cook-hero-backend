@@ -23,14 +23,6 @@ public class NotificationService {
     private final NotificationRepository notificationRepository;
     private final UserRepository userRepository;
 
-//    createExpiredNotification(long userId, int quantity, String ingredientName, LocalDate expirationDate)
-    @PostConstruct
-    public void test() {
-//        for(int i = 0; i < 50; i++) {
-//            createExpiredNotification(4L, i, "Ziemniak", LocalDate.now());
-//        }
-    }
-
     public List<Notification> getAllNotifications(String userUuid) throws UserNotFoundException {
         User user = userRepository.findUserByUuid(userUuid).orElse(null);
         if (user != null) {
@@ -128,6 +120,5 @@ public class NotificationService {
         throw new UserNotFoundException("User was not found");
 
     }
-
 
 }

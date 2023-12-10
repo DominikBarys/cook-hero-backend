@@ -1,7 +1,6 @@
 package com.barysdominik.notificationservice.scheduler;
 
 import com.barysdominik.notificationservice.repository.dao.UserIngredientDao;
-import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;

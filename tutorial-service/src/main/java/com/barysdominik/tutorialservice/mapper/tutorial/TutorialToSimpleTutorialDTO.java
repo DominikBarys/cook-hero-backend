@@ -28,5 +28,4 @@ public class TutorialToSimpleTutorialDTO {
         String[] imageUrls = tutorial.getImageUrls();
         return (imageUrls != null && imageUrls.length >=1) ? imageUrls[0] : null;
     }
-
 }

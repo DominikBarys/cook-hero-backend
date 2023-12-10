@@ -5,7 +5,6 @@ import com.barysdominik.tutorialservice.entity.http.Response;
 import com.barysdominik.tutorialservice.exception.ObjectAlreadyExistInDatabaseException;
 import com.barysdominik.tutorialservice.exception.ObjectDoesNotExistInDatabaseException;
 import com.barysdominik.tutorialservice.mediator.DishMediator;
-import com.barysdominik.tutorialservice.repository.DishRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -51,5 +50,4 @@ public class DishController {
     public ResponseEntity<Response> deleteDish(@RequestParam String shortId) {
         return dishMediator.deleteDish(shortId);
     }
-
 }

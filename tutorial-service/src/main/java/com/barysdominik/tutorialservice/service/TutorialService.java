@@ -27,7 +27,6 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -235,7 +234,6 @@ public class TutorialService {
         );
     }
 
-    //TODO can not work
     public void changeTutorialCarouselImages(String shortId, String[] newImages) {
         Tutorial tutorial = tutorialRepository.findTutorialByShortId(shortId).orElse(null);
         if (tutorial != null) {
@@ -313,7 +311,6 @@ public class TutorialService {
         tutorialRepository.save(tutorial);
     }
 
-    //TODO maybe GSON in future here
     public void changeTutorialParameters(String shortId, String newParameters) {
         Tutorial tutorial = tutorialRepository.findTutorialByShortId(shortId).orElse(null);
         if (tutorial != null) {
@@ -406,7 +403,7 @@ public class TutorialService {
             tutorialRepository.delete(tutorial);
             for (String imageUrl : tutorial.getImageUrls()) {
                 try {
-                    //deleteImage(imageUrl); //TODO commented for testing purposes
+                    deleteImage(imageUrl);
                 } catch (Exception ex) {
                     throw new RuntimeException(
                             "Tutorial was deleted but there occurred a problem with deleting files"
@@ -421,9 +418,5 @@ public class TutorialService {
     private void deleteImage(String shortId) {
         RestTemplate restTemplate = new RestTemplate();
         restTemplate.delete(FILE_SERVICE_EXTERNAL_URL + "?shortId=" + shortId);
-    }
-
-    public long countTutorials() {
-        return tutorialRepository.count();
     }
 }

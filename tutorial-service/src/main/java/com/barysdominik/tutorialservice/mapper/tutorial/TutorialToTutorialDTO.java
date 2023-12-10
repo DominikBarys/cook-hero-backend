@@ -10,7 +10,6 @@ import com.barysdominik.tutorialservice.entity.tutorial.Tutorial;
 import com.barysdominik.tutorialservice.entity.tutorial.TutorialDTO;
 import com.barysdominik.tutorialservice.entity.user.User;
 import com.barysdominik.tutorialservice.entity.user.UserDTO;
-import com.barysdominik.tutorialservice.repository.CategoryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -20,8 +19,6 @@ import java.util.List;
 @Component
 @RequiredArgsConstructor
 public class TutorialToTutorialDTO {
-
-    private final CategoryRepository categoryRepository;
 
     public TutorialDTO mapTutorialToTutorialDTO(Tutorial tutorial) {
         TutorialDTO tutorialDTO = new TutorialDTO();
@@ -86,14 +83,4 @@ public class TutorialToTutorialDTO {
         }
         return ingredientDTOS;
     }
-
-    //    private List<String> getMainIngredientsShortIds(Tutorial tutorial) {
-//        List<Ingredient> ingredients = tutorial.getMainIngredients();
-//        List<String> ingredientShortIds = new ArrayList<>();
-//        for (Ingredient ingredient : ingredients) {
-//            ingredientShortIds.add(ingredient.getShortId());
-//        }
-//        return ingredientShortIds;
-//    }
-
 }

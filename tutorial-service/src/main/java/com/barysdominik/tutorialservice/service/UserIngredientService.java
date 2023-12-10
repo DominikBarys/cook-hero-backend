@@ -3,7 +3,6 @@ package com.barysdominik.tutorialservice.service;
 import com.barysdominik.tutorialservice.entity.user.User;
 import com.barysdominik.tutorialservice.entity.userIngredient.ChangeUserIngredientDTO;
 import com.barysdominik.tutorialservice.entity.userIngredient.UserIngredient;
-import com.barysdominik.tutorialservice.entity.userIngredient.UserIngredientDTO;
 import com.barysdominik.tutorialservice.exception.ObjectDoesNotExistInDatabaseException;
 import com.barysdominik.tutorialservice.repository.UserIngredientRepository;
 import com.barysdominik.tutorialservice.repository.UserRepository;

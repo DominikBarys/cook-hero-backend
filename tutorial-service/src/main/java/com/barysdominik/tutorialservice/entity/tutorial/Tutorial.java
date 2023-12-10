@@ -54,7 +54,6 @@ public class Tutorial {
     @ManyToOne
     @JoinColumn(name = "categoryId", referencedColumnName = "id")
     private Category category;
-    //dzieki temu moglem od razu dodac autora robiac tylko save na Tutorial
     @ManyToOne(
             cascade = {CascadeType.MERGE, CascadeType.PERSIST}
     )

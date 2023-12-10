@@ -1,7 +1,6 @@
 package com.barysdominik.tutorialservice.entity.http;
 
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 
 import java.sql.Timestamp;
 

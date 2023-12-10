@@ -1,7 +1,6 @@
 package com.barysdominik.tutorialservice.service;
 
 import com.barysdominik.tutorialservice.entity.page.Page;
-import com.barysdominik.tutorialservice.entity.page.PageDTO;
 import com.barysdominik.tutorialservice.entity.tutorial.Tutorial;
 import com.barysdominik.tutorialservice.exception.ObjectDoesNotExistInDatabaseException;
 import com.barysdominik.tutorialservice.repository.PageRepository;
@@ -15,10 +14,8 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class PageService {
-
     private final PageRepository pageRepository;
     private final TutorialRepository tutorialRepository;
-
 
     public List<Page> getPages(String tutorialShortId) throws ObjectDoesNotExistInDatabaseException {
         Tutorial tutorial = tutorialRepository.findTutorialByShortId(tutorialShortId).orElse(null);

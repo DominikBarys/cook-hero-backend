@@ -54,5 +54,4 @@ public class DishService {
                 "Dish with shortId: '" + shortId + "' does not exist in database"
         );
     }
-
 }

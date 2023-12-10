@@ -10,14 +10,14 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class SimpleTutorialDTO {
-    private String name; //
+    private String name;
     private String shortId;
-    private int timeToPrepare;//
-    private int difficulty;//
-    private String imageUrl;//
-    private String shortDescription;//
-    private boolean hasMeat;//
-    private boolean isVeganRecipe;//
-    private boolean isSweetRecipe;//
-    private boolean isSpicyRecipe;//
+    private int timeToPrepare;
+    private int difficulty;
+    private String imageUrl;
+    private String shortDescription;
+    private boolean hasMeat;
+    private boolean isVeganRecipe;
+    private boolean isSweetRecipe;
+    private boolean isSpicyRecipe;
 }

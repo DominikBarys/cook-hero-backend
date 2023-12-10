@@ -66,7 +66,6 @@ public class TutorialController {
         return tutorialMediator.changeTutorialThumbnail(shortId, newThumbnailPosition);
     }
 
-    //TODO to do sprawdzenia, wgl wszystkie operacje zwiazane z image do sprawdzenia
     @PatchMapping("change-images")
     public ResponseEntity<Response> changeTutorialCarouselImages(
             @RequestParam String shortId,
@@ -99,7 +98,6 @@ public class TutorialController {
         return tutorialMediator.changeTutorialDish(shortId, dishShortId);
     }
 
-    //this actually will set whole new array of ingredients, if we want to add, first we need to copy old ingredients
     @PatchMapping("/add-ingredients")
     public ResponseEntity<Response> addMainIngredientsToTutorial(
             @RequestBody List<IngredientDTO> ingredientDTOList,

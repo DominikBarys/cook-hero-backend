@@ -20,8 +20,6 @@ public class Page {
     private long id;
     private String shortId;
     private int pageNumber;
-    //TODO mozliwe ze htmlContent bedzie tablica i bedzie druga tablica z adresami do zdjec
-    // da to efekt tego ze pod danym kawalkiem html bedzie zdjecie itd.
     @Column(columnDefinition = "varchar(1048576)")
     private String htmlContent;
     @ManyToOne

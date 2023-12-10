@@ -8,7 +8,6 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 public class PageToPageDTO {
-
     public PageDTO mapPageToPageDTO(Page page) {
         PageDTO pageDTO = new PageDTO();
         pageDTO.setShortId(page.getShortId());
@@ -17,5 +16,4 @@ public class PageToPageDTO {
         pageDTO.setTutorialShortId(page.getTutorial().getShortId());
         return pageDTO;
     }
-
 }

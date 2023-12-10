@@ -9,7 +9,6 @@ import com.barysdominik.tutorialservice.mapper.useringredient.UserIngredientDTOT
 import com.barysdominik.tutorialservice.mapper.useringredient.UserIngredientToUserIngredientDTO;
 import com.barysdominik.tutorialservice.service.UserIngredientService;
 import lombok.RequiredArgsConstructor;
-import org.mapstruct.control.MappingControl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;

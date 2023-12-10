@@ -24,5 +24,4 @@ public class PageDTOToPage {
 
         return page;
     }
-
 }

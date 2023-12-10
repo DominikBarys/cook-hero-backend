@@ -1,11 +1,8 @@
 package com.barysdominik.notificationservice.repository.dao;
 
-import com.barysdominik.notificationservice.entity.notification.Notification;
 import com.barysdominik.notificationservice.exception.IngredientNotFoundException;
 import com.barysdominik.notificationservice.exception.UserNotFoundException;
-import com.barysdominik.notificationservice.repository.NotificationRepository;
 import com.barysdominik.notificationservice.service.NotificationService;
-import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;

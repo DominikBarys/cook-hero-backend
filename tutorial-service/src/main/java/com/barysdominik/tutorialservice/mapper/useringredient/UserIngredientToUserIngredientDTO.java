@@ -10,7 +10,6 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 public class UserIngredientToUserIngredientDTO {
-
     public UserIngredientDTO mapUserIngredientToUserIngredientDTO(UserIngredient userIngredient) {
         UserIngredientDTO userIngredientDTO = new UserIngredientDTO();
         userIngredientDTO.setShortId(userIngredient.getShortId());
@@ -27,6 +26,4 @@ public class UserIngredientToUserIngredientDTO {
         ingredientDTO.setName(ingredient.getName());
         return ingredientDTO;
     }
-
-
 }

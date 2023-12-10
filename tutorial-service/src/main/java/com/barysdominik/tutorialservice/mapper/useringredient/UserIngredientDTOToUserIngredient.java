@@ -12,7 +12,6 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 public class UserIngredientDTOToUserIngredient {
-
     private final IngredientRepository ingredientRepository;
     private final UserRepository userRepository;
 
@@ -29,5 +28,4 @@ public class UserIngredientDTOToUserIngredient {
         userIngredient.setOwner(user);
         return userIngredient;
     }
-
 }

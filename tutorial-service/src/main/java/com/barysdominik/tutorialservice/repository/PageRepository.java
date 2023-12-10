@@ -8,13 +8,9 @@ import java.util.List;
 import java.util.Optional;
 
 public interface PageRepository extends JpaRepository<Page, Long> {
-
     List<Page> getPagesByTutorial(Tutorial tutorial);
-
     Optional<Page> findPageByShortId(String shortId);
-
     long countPagesByTutorial(Tutorial tutorial);
-
     List<Page> getAllByTutorial(Tutorial tutorial);
 
 }
