@@ -84,14 +84,40 @@ public class FtpService {
     }
 
     private FTPClient getFtpConnection() throws IOException {
-        FTPClient ftpClient = new FTPClient();
-        ftpClient.setConnectTimeout(10000);
-        ftpClient.setControlKeepAliveTimeout(300);
-        ftpClient.connect(FTP_SERVER, FTP_PORT);
-        ftpClient.login(FTP_USERNAME, FTP_PASSWORD);
+        return getFtpConnectionWithRetries();
+    }
 
-        ftpClient.enterLocalPassiveMode();
-        ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
+    private FTPClient getFtpConnectionWithRetries() throws IOException {
+        int maxRetries = 30;
+        int retryCount = 0;
+        FTPClient ftpClient = new FTPClient();
+
+        while (retryCount < maxRetries) {
+            try {
+                ftpClient.setConnectTimeout(10000);
+                ftpClient.setControlKeepAliveTimeout(30000);
+                ftpClient.connect(FTP_SERVER, FTP_PORT);
+                ftpClient.login(FTP_USERNAME, FTP_PASSWORD);
+
+                ftpClient.enterLocalPassiveMode();
+                ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
+
+                break;
+            } catch (Exception e) {
+                log.warn("FTP Connection Closed Exception: Retry attempt {}/{}", retryCount + 1, maxRetries);
+                retryCount++;
+                if (retryCount == maxRetries) {
+                    throw new IOException("FTP Connection Closed Exception after " + maxRetries + " attempts", e);
+                }
+
+                try {
+                    Thread.sleep(100); // 5 seconds
+                } catch (InterruptedException ignored) {
+                    Thread.currentThread().interrupt();
+                }
+            }
+        }
+
         return ftpClient;
     }
 
