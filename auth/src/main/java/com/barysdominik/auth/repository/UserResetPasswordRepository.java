@@ -12,7 +12,7 @@ import java.util.Optional;
 public interface UserResetPasswordRepository extends JpaRepository<UserResetPassword, Long> {
     @Query(
             nativeQuery = true,
-            value = "SELECT * FROM user_reset_password where created_at <= current_timestamp - INTERVAL '5 minutes'"
+            value = "SELECT * FROM user_reset_password where created_at <= current_timestamp - INTERVAL '15 minutes'"
     )
     List<UserResetPassword> findExpiredOperations();
     Optional<UserResetPassword> findByUuid(String uuid);

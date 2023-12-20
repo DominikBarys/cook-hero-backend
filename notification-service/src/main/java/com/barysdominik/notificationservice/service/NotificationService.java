@@ -91,6 +91,14 @@ public class NotificationService {
         throw new UserNotFoundException("User was not found");
     }
 
+    @PostConstruct
+    public void test1() {
+        createCloseToExpirationNotification(26L, 2, "Mleko 1,5%", LocalDate.of(2023, 12, 18));
+        createCloseToExpirationNotification(26L, 1, "Chleb", LocalDate.of(2023, 12, 17));
+        createCloseToExpirationNotification(26L, 3, "Ser żółty", LocalDate.of(2023, 12, 18));
+        createExpiredNotification(26L, 1, "Mięso drobiowe, 500g", LocalDate.of(2023, 12, 16));
+    }
+
     public void createCloseToExpirationNotification(
             long userId,
             int quantity,

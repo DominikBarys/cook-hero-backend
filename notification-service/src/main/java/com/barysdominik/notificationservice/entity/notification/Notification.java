@@ -22,7 +22,7 @@ public class Notification {
     private long id;
     private String shortId;
     private LocalDate creationDate;
-    @Column(columnDefinition = "varchar(1024)")
+    @Column(columnDefinition = "varchar(1234567)")
     private String message;
     @Enumerated(EnumType.STRING)
     private NotificationType type;
